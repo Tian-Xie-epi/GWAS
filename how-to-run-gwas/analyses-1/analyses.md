@@ -370,7 +370,7 @@ awk '{print $1,$2}' pheno_pooled_invBP.txt > pheno_pooled_sample.txt
 awk '{print $1,$2}' pheno_males_invBP.txt > pheno_males_sample.txt
 awk '{print $1,$2}' pheno_females_invBP.txt > pheno_females_sample.txt
 
-for i in {1..22} X
+for i in {1..22} 
 do
 plink2 --vcf chr$i.dose.vcf.gz dosage=DS --id-delim \
 --keep pheno_pooled_sample.txt --missing variant-only --freq --hardy \

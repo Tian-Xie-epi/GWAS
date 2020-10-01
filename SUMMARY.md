@@ -16,6 +16,7 @@
 * [Analyses](how-to-run-gwas/analyses-1/README.md)
   * [GWAS for unrelated individuals](how-to-run-gwas/analyses-1/analyses.md)
   * [GWAS for related individuals](how-to-run-gwas/analyses-1/gwas-for-related-individuals.md)
+* [Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
 * [Meta-GWAS](how-to-run-gwas/meta-gwas.md)
 * [Follow-up](how-to-run-gwas/follow-up.md)
 
