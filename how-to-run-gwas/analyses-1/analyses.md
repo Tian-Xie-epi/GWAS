@@ -1,4 +1,4 @@
-# GWAS for unrelated individuals
+# PLINK2 for unrelated individuals
 
 ## Background
 

@@ -1,0 +1,2 @@
+# SNPTEST for unrelated individuals
+

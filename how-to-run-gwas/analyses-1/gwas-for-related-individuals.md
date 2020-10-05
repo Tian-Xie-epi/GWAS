@@ -1,2 +1,2 @@
-# GWAS for related individuals
+# SAIGEgds for related individuals
 
