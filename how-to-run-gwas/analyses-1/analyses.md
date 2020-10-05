@@ -125,7 +125,7 @@ We use the rank based inverse normal transformed data to run the association tes
 
 ### PLINK2 to run models
 
-`PLINK2` is used to run above models and all analyses are conducted in the computer cluster of our university \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\) based on Linux operating system \(A beginners guide [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/)\). 
+`PLINK2` is used to run above models and all analyses are conducted in the computer cluster of  University of Groningen \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\) based on Linux operating system \(A beginners guide [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/)\). 
 
 First we use `module load` to load PLINK2 and create \(`mkdir`\) a sub-folder "GWAS\_results". Secondly we print the first two columns \(`awk '{print $1,$2}'`\) of the phenotype file, which contains FID and IID of samples used for GWAS. Finally we run GWAS using PLINK2 and store the results in the folder "GWAS\_results" \(PLINK2 [https://www.cog-genomics.org/plink/2.0](https://www.cog-genomics.org/plink/2.0)\). 
 
@@ -339,7 +339,14 @@ fwrite(PP_results,file=paste0("PP_",c[i],"_EA_250920_TX.txt"),sep="\t")
 
 ## Summary
 
+In summary, to run GWAS in unrelated individuals, we need to 1\) prepare phenotype, 2\) run GWAS using PLINK2, 3\) extract imputation quality, 4\) merge all results. 
 
+For the sake of convenience and efficiency, we put all these four steps in one shell script \(see below GWAS\_pipeline.sh\) and execute it in the cluster \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\). In practice, we need to:
+
+1. Put all required data \(phenotype and PCA data, imputed data \(VCF\) and info data\) and all scripts \(GWAS\_pipeline.sh, merge\_results.R, merge\_results.R\) in the same folder in the cluster.
+2. Execute the shell script using the command `sbatch GWAS_pipeline.sh`
+
+It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_250920\_TX.txt.gz\) in the **subfolder GWAS\_results**. In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
 
 {% code title="GWAS\_pipeline.sh" %}
 ```bash
@@ -356,10 +363,10 @@ fwrite(PP_results,file=paste0("PP_",c[i],"_EA_250920_TX.txt"),sep="\t")
 #### Date: 20200928
 #### Project: GWAS pipeline 
 
-module load PLINK/2.00-alpha2.1-foss-2018a
-module load R/3.6.1-foss-2018a
+module load PLINK/2.00-alpha2.1-foss-2018a      #load PLINK2
+module load R/3.6.1-foss-2018a                  #load R
 
-mkdir GWAS_results
+mkdir GWAS_results                  #create a subfolder to store the results
 cp merge_results.R ./GWAS_results/  #copy Rscript to subfolder
 
 #################################################### GWAS pipeline
@@ -409,7 +416,7 @@ zcat chr$i.info.gz | awk 'BEGIN {FS=OFS="\t"} {print $1,$7,$8}'\
 done
 
 ######################### step 4 merge all results
-cd GWAS_results 
+cd GWAS_results                #go to the subfolder which store the results
 
 ## first merge all chromosomes 
 ## Note: keep header of chr1 and remove headers in other chromosomes
