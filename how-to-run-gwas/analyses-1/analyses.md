@@ -380,7 +380,7 @@ cp merge_results.R ./GWAS_results/  #copy Rscript to subfolder
 #using R to deal with phenotype 
 Rscript prepare_phenotype.R
 
-######################### Step 2 run GWAS using PLINK2
+######################### Step 2 run GWAS using PLINK2 (for pooled, males and females)
 
 awk '{print $1,$2}' pheno_pooled_invBP.txt > pheno_pooled_sample.txt
 awk '{print $1,$2}' pheno_males_invBP.txt > pheno_males_sample.txt
