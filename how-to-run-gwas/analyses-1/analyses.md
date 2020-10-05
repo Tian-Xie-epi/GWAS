@@ -206,7 +206,14 @@ VCF files just contain sample IDs, instead of the distinct family and individual
 {% endhint %}
 
 {% hint style="info" %}
-By default, dosage information is not imported. To import the GP field \(a posterior probability per possible genotype, not phred scaled\), add 'dosage=GP' \(or 'dosage=GP-force', see below\). To import Minimac4-style DS+HDS phased dosage, add 'dosage=HDS'. 'dosage=DS' \(or anything else for now\) causes the named field to be interpreted as a Minimac3-style dosage.
+In VCF file, genotype data has four different field separated by ":". These four fields are:
+
+* **GT** - Estimated most likely genotype.
+* **DS** - Estimated alternate allele dosage \[P\(0/1\)+2\*P\(1/1\)\].
+* **HDS** - Estimated phased haploid alternate allele dosage.
+* **GP** - Estimated Posterior Genotype Probabilities P\(0/0\), P\(0/1\) and P\(1/1\).
+
+The difference between DS and HDS is that DS is unphased and HDS is phased. However, --glm does not care about genotype/dosage phase; so here we still use **dosage=DS**. 
 {% endhint %}
 
 ### GWAS results output
@@ -331,6 +338,8 @@ fwrite(PP_results,file=paste0("PP_",c[i],"_EA_250920_TX.txt"),sep="\t")
 {% endcode %}
 
 ## Summary
+
+
 
 {% code title="GWAS\_pipeline.sh" %}
 ```bash
