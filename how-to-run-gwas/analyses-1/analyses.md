@@ -343,10 +343,10 @@ In summary, to run GWAS in unrelated individuals, we need to 1\) prepare phenoty
 
 For the sake of convenience and efficiency, we put all these four steps in one shell script \(see below GWAS\_pipeline.sh\) and execute it in the cluster \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\). In practice, we need to:
 
-1. Put all required data \(phenotype and PCA data, imputed data \(VCF\) and info data\) and all scripts \(GWAS\_pipeline.sh, merge\_results.R, merge\_results.R\) in the same folder in the cluster.
+1. Put all required data \(phenotype and PCA data, imputed data \(VCF\) and info data\) and all scripts \(GWAS\_pipeline.sh, prepare\_phenotype.R, merge\_results.R\) in the same folder in the cluster.
 2. Execute the shell script using the command `sbatch GWAS_pipeline.sh`
 
-It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_250920\_TX.txt.gz\) in the **subfolder GWAS\_results**. In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
+It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_250920\_TX.txt.gz\) in the subfolder **GWAS\_results**. In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
 
 {% code title="GWAS\_pipeline.sh" %}
 ```bash
