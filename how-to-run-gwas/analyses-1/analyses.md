@@ -221,7 +221,7 @@ The difference between DS and HDS is that DS is unphased and HDS is phased. Howe
 PLINK2 produce four types of result files:
 
 * Results of GWAS \(e.g. BP\_pooled\_chr22.inv\_SBP.glm.linear\) including 12 columns: \#CHROM, POS, ID, REF, ALT, A1, TEST, OBS\_CT \(Number of samples\), **BETA**, **SE**, T\_STAT, **P**. [https://www.cog-genomics.org/plink/2.0/formats\#glm\_linear](https://www.cog-genomics.org/plink/2.0/formats#glm_linear)
-* Allele frequency file \(BP\_pooled\_chr22.afreq\) including 6columns: \#CHROM, ID, REF,    ALT, **ALT\_FREQS** \(AF of alternative allele\), OBS\_CT. 
+* Allele frequency file \(BP\_pooled\_chr22.afreq\) including 6columns: \#CHROM, ID, REF,  ALT, **ALT\_FREQS** \(AF of alternative allele\), OBS\_CT. 
 * Callrate file \(BP\_pooled\_chr22.vmiss\) including 5 columns: \#CHROM, ID, MISSING\_CT, OBS\_CT, **F\_MISS \(CALLRATE=1-F\_MISS\)**
 * HWE file \(BP\_pooled\_chr22.hardy\) including Hardy-Weinberg equilibrium exact test p-value \(column name _P_\).   
 
