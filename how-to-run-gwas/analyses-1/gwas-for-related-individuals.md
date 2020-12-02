@@ -43,3 +43,5 @@ On this page you will know how to run GWAS in related individuals using the R pa
   </tbody>
 </table>
 
+
+
