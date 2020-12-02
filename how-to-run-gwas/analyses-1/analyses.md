@@ -56,7 +56,7 @@ For example, in our meta-GWAS of child BP project, we should exclude**:**
 
 In addition, stratified analyses are required:
 
-1. Ethnicity: Perform all analyses stratified by ethnicity \(Caucasians/Europeans, African Americans, etc.\) if you have data from different ethnicity. 
+1. Ethnicity: If we have data from different ethnicity, then perform all analyses stratified by ethnicity \(Caucasians/Europeans, African Americans, etc.\). If the data is mainly from one ethnicity, the few individuals from other ethnicities can be excluded. 
 2. Gender based: Perform analyses stratifying for sex, separately in males and females as well as a combined analyses, pooling all. 
 
 ## Step 1 Prepare Phenotype
