@@ -2,7 +2,7 @@
 
 ## Background
 
-On this page you will know how to run GWAS in unrelated individuals using the popular genetic analyses tool `PLINK2`_._  
+On this page you will know how to run GWAS in unrelated individuals using the popular genetic analyses tool `PLINK2`_._  Here we use blood pressure \(BP\) trait as example.
 
 ## Required Data
 
@@ -49,7 +49,7 @@ use `zcat chr22.dose.vcf.gz | cut -f1-10 | more` to inspect dose.vcf.gz file.
 
 Before running GWAS, we always need to prepare phenotype \(e.g. trait transformation\). According to the analyses plan of our meta-GWAS project, we should do the following trait transformation:
 
-1. Calculate residuals by running this regression model for each trait separately in males and females: Trait \(SBP/DBP/MAP/PP\) ~ age + height + PCs \(if available\) + \(study specific covariates if required\)
+1. Calculate residuals by running this regression model for each trait separately in males and females: Trait \(SBP/DBP/MAP/PP/HR\) ~ age + height + PCs \(if available\) + \(study specific covariates if required\)
 2. Perform rank-based Inverse Normal transformation of these residuals
 
 Here I present a example of R code for preparing phenotype. The R code follows steps: 
@@ -73,8 +73,8 @@ library(dplyr)
 library(tableone)
 
 ##### Step 1 data input (keep FID and IID variable for GWAS)
-pheno<-fread("BP_phenotypes.csv")  #ID,Age,Sex(1-males,2-females),Height,Weight,SBP,DBP
-colnames(pheno)<-c("IID","Age","Sex","Height","Weight","SBP","DBP")  
+pheno<-fread("BP_phenotypes.csv")  #ID,Age,Sex(1-males,2-females),Height,Weight,SBP,DBP,HR
+colnames(pheno)<-c("IID","Age","Sex","Height","Weight","SBP","DBP","HR")  
 pheno<-pheno%>% mutate(PP=SBP-DBP,MAP=1/3*SBP+2/3*DBP)
 
 PCA<-fread("PCAresult.eigenvec")
@@ -85,7 +85,7 @@ PCA<-PCA[,1:12]
 pheno_forGWAS<-merge(pheno,PCA,by="IID")
 
 ##### Step 3 describe phenotype (mean, sd) for supplementary table
-tableone_pheno<-cbind(print(CreateTableOne(data = pheno_forGWAS[,c("Age","Height","Sex","SBP","DBP","PP","MAP")])),print(CreateTableOne(strata = "Sex", data = pheno_forGWAS[,c("Age","Height","Sex","SBP","DBP","PP","MAP")])))
+tableone_pheno<-cbind(print(CreateTableOne(data = pheno_forGWAS[,c("Age","Height","Sex","SBP","DBP","PP","MAP","HR")])),print(CreateTableOne(strata = "Sex", data = pheno_forGWAS[,c("Age","Height","Sex","SBP","DBP","PP","MAP","HR")])))
 write.csv(tableone_pheno,"phenotype_tableone.csv")
 
 ##### Step 4 Trait transformation (Inverse Normal transformation of residuals)
@@ -97,11 +97,11 @@ resid_linear=residuals(lm(pheno~Age+Height+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+P
 inv_pheno=qnorm((rank(resid_linear,na.last="keep")-0.5)/sum(!is.na(resid_linear)))
 return(inv_pheno)}
 
-pheno_males<- pheno_males %>% mutate(inv_SBP=compute_INR(SBP,pheno_males),inv_DBP=compute_INR(DBP,pheno_males),inv_MAP=compute_INR(MAP,pheno_males),inv_PP=compute_INR(PP,pheno_males))
-pheno_females<- pheno_females %>% mutate(inv_SBP=compute_INR(SBP,pheno_females),inv_DBP=compute_INR(DBP,pheno_females),inv_MAP=compute_INR(MAP,pheno_females),inv_PP=compute_INR(PP,pheno_females))
+pheno_males<- pheno_males %>% mutate(inv_SBP=compute_INR(SBP,pheno_males),inv_DBP=compute_INR(DBP,pheno_males),inv_MAP=compute_INR(MAP,pheno_males),inv_PP=compute_INR(PP,pheno_males),inv_HR=compute_INR(HR,pheno_males))
+pheno_females<- pheno_females %>% mutate(inv_SBP=compute_INR(SBP,pheno_females),inv_DBP=compute_INR(DBP,pheno_females),inv_MAP=compute_INR(MAP,pheno_females),inv_PP=compute_INR(PP,pheno_females),inv_HR=compute_INR(HR,pheno_females))
 
-pheno_males_invBP<-pheno_males %>% select(FID,IID,inv_SBP:inv_PP)
-pheno_females_invBP<-pheno_females %>% select(FID,IID,inv_SBP:inv_PP)
+pheno_males_invBP<-pheno_males %>% select(FID,IID,inv_SBP:inv_HR)
+pheno_females_invBP<-pheno_females %>% select(FID,IID,inv_SBP:inv_HR)
 pheno_pooled_invBP<-rbind(pheno_males_invBP,pheno_females_invBP)
 
 ##### Step 5 export data for GWAS  
@@ -119,9 +119,9 @@ We use the rank based inverse normal transformed data to run the association tes
 
 1. All individuals \(pool the inverse normal values calculated for males and females separately\) `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/inv_HR) ~ SNP` 
 
-2. In Males `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/ inv_HR) ~ SNP` 
+2. In Males `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/inv_HR) ~ SNP` 
 
-3. In Females `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/ inv_HR) ~ SNP` 
+3. In Females `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/inv_HR) ~ SNP` 
 
 ### PLINK2 to run models
 
@@ -147,7 +147,7 @@ plink2 \
 --freq \
 --hardy \
 --pheno pheno_pooled_invBP.txt \
---pheno-name inv_SBP inv_DBP inv_PP inv_MAP \
+--pheno-name inv_SBP inv_DBP inv_PP inv_MAP inv_HR\
 --glm omit-ref \
 --out GWAS_results/BP_pooled_chr22
 ```
@@ -171,7 +171,7 @@ plink2 \
 --freq \
 --hardy \
 --pheno pheno_pooled_invBP.txt \
---pheno-name inv_SBP inv_DBP inv_PP inv_MAP \
+--pheno-name inv_SBP inv_DBP inv_PP inv_MAP inv_HR\
 --glm omit-ref \
 --out GWAS_results/BP_pooled_chr$i
 done
@@ -265,6 +265,7 @@ head -n 1 BP_pooled_chr1.inv_SBP.glm.linear > SBP_pooled_linear_result
 head -n 1 BP_pooled_chr1.inv_DBP.glm.linear > DBP_pooled_linear_result
 head -n 1 BP_pooled_chr1.inv_MAP.glm.linear > MAP_pooled_linear_result
 head -n 1 BP_pooled_chr1.inv_PP.glm.linear > PP_pooled_linear_result
+head -n 1 BP_pooled_chr1.inv_HR.glm.linear > HR_pooled_linear_result
 head -n 1 info_Rsq_chr1 > imputation_quality
 head -n 1 BP_pooled_chr1.afreq > BP_pooled_EAF
 head -n 1 BP_pooled_chr1.vmiss > BP_pooled_callrate
@@ -277,6 +278,7 @@ sed '1d' BP_pooled_chr$i.inv_SBP.glm.linear | cat >> SBP_pooled_linear_result
 sed '1d' BP_pooled_chr$i.inv_DBP.glm.linear | cat >> DBP_pooled_linear_result
 sed '1d' BP_pooled_chr$i.inv_MAP.glm.linear | cat >> MAP_pooled_linear_result
 sed '1d' BP_pooled_chr$i.inv_PP.glm.linear | cat >> PP_pooled_linear_result
+sed '1d' BP_pooled_chr$i.inv_HR.glm.linear | cat >> HR_pooled_linear_result
 sed '1d' info_Rsq_chr$i | cat >> imputation_quality
 sed '1d' BP_pooled_chr$i.afreq | cat >> BP_pooled_EAF
 sed '1d' BP_pooled_chr$i.vmiss | cat >> BP_pooled_callrate
@@ -308,10 +310,13 @@ SBP_linear<-fread(paste0("SBP_",c[i],"_linear_result"))
 DBP_linear<-fread(paste0("DBP_",c[i],"_linear_result"))
 MAP_linear<-fread(paste0("MAP_",c[i],"_linear_result"))
 PP_linear<-fread(paste0("PP_",c[i],"_linear_result"))
-colnames(SBP_linear)<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
-colnames(DBP_linear)<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
-colnames(MAP_linear)<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
-colnames(PP_linear)<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
+HR_linear<-fread(paste0("HR_",c[i],"_linear_result"))
+headername<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
+colnames(SBP_linear)<-headername
+colnames(DBP_linear)<-headername
+colnames(MAP_linear)<-headername
+colnames(PP_linear)<-headername
+colnames(HR_linear)<-headername
 
 EAF<-fread(paste0("BP_",c[i],"_EAF"))
 EAF<-EAF %>% select(ID,ALT_FREQS) %>% rename(EAF=ALT_FREQS)
@@ -327,12 +332,14 @@ SBP_results<-SBP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>%
 DBP_results<-DBP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
 MAP_results<-MAP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
 PP_results<-PP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+HR_results<-HR_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
 
 #export data
 fwrite(SBP_results,file=paste0("SBP_",c[i],"_EA_250920_TX.txt"),sep="\t")
 fwrite(DBP_results,file=paste0("DBP_",c[i],"_EA_250920_TX.txt"),sep="\t")
 fwrite(MAP_results,file=paste0("MAP_",c[i],"_EA_250920_TX.txt"),sep="\t")
 fwrite(PP_results,file=paste0("PP_",c[i],"_EA_250920_TX.txt"),sep="\t")
+fwrite(HR_results,file=paste0("HR_",c[i],"_EA_250920_TX.txt"),sep="\t")
 }
 ```
 {% endcode %}
