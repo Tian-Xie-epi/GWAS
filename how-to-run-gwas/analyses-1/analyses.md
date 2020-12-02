@@ -398,21 +398,21 @@ do
 plink2 --vcf chr$i.dose.vcf.gz dosage=DS --id-delim \
 --keep pheno_pooled_sample.txt --missing variant-only --freq --hardy \
 --pheno pheno_pooled_invBP.txt \
---pheno-name inv_SBP inv_DBP inv_PP inv_MAP \
+--pheno-name inv_SBP inv_DBP inv_PP inv_MAP inv_HR\
 --glm omit-ref \
 --out GWAS_results/BP_pooled_chr$i
 
 plink2 --vcf chr$i.dose.vcf.gz dosage=DS --id-delim \
 --keep pheno_males_sample.txt --missing variant-only --freq --hardy \
 --pheno pheno_males_invBP.txt \
---pheno-name inv_SBP inv_DBP inv_PP inv_MAP \
+--pheno-name inv_SBP inv_DBP inv_PP inv_MAP inv_HR\
 --glm omit-ref \
 --out GWAS_results/BP_males_chr$i
 
 plink2 --vcf chr$i.dose.vcf.gz dosage=DS --id-delim \
 --keep pheno_females_sample.txt --missing variant-only --freq --hardy \
 --pheno pheno_females_invBP.txt \
---pheno-name inv_SBP inv_DBP inv_PP inv_MAP \
+--pheno-name inv_SBP inv_DBP inv_PP inv_MAP inv_HR\
 --glm omit-ref \
 --out GWAS_results/BP_females_chr$i
 
@@ -432,14 +432,19 @@ head -n 1 BP_pooled_chr1.inv_SBP.glm.linear > SBP_pooled_linear_result
 head -n 1 BP_pooled_chr1.inv_DBP.glm.linear > DBP_pooled_linear_result
 head -n 1 BP_pooled_chr1.inv_MAP.glm.linear > MAP_pooled_linear_result
 head -n 1 BP_pooled_chr1.inv_PP.glm.linear > PP_pooled_linear_result
+head -n 1 BP_pooled_chr1.inv_HR.glm.linear > HR_pooled_linear_result
+
 head -n 1 BP_males_chr1.inv_SBP.glm.linear > SBP_males_linear_result
 head -n 1 BP_males_chr1.inv_DBP.glm.linear > DBP_males_linear_result
 head -n 1 BP_males_chr1.inv_MAP.glm.linear > MAP_males_linear_result
 head -n 1 BP_males_chr1.inv_PP.glm.linear > PP_males_linear_result
+head -n 1 BP_males_chr1.inv_HR.glm.linear > HR_males_linear_result
+
 head -n 1 BP_females_chr1.inv_SBP.glm.linear > SBP_females_linear_result
 head -n 1 BP_females_chr1.inv_DBP.glm.linear > DBP_females_linear_result
 head -n 1 BP_females_chr1.inv_MAP.glm.linear > MAP_females_linear_result
 head -n 1 BP_females_chr1.inv_PP.glm.linear > PP_females_linear_result
+head -n 1 BP_females_chr1.inv_HR.glm.linear > HR_females_linear_result
 
 head -n 1 info_Rsq_chr1 > imputation_quality
 head -n 1 BP_pooled_chr1.afreq > BP_pooled_EAF
@@ -459,14 +464,17 @@ sed '1d' BP_pooled_chr$i.inv_SBP.glm.linear | cat >> SBP_pooled_linear_result
 sed '1d' BP_pooled_chr$i.inv_DBP.glm.linear | cat >> DBP_pooled_linear_result
 sed '1d' BP_pooled_chr$i.inv_MAP.glm.linear | cat >> MAP_pooled_linear_result
 sed '1d' BP_pooled_chr$i.inv_PP.glm.linear | cat >> PP_pooled_linear_result
+sed '1d' BP_pooled_chr$i.inv_HR.glm.linear | cat >> HR_pooled_linear_result
 sed '1d' BP_males_chr$i.inv_SBP.glm.linear | cat >> SBP_males_linear_result
 sed '1d' BP_males_chr$i.inv_DBP.glm.linear | cat >> DBP_males_linear_result
 sed '1d' BP_males_chr$i.inv_MAP.glm.linear | cat >> MAP_males_linear_result
 sed '1d' BP_males_chr$i.inv_PP.glm.linear | cat >> PP_males_linear_result
+sed '1d' BP_males_chr$i.inv_HR.glm.linear | cat >> HR_males_linear_result
 sed '1d' BP_females_chr$i.inv_SBP.glm.linear | cat >> SBP_females_linear_result
 sed '1d' BP_females_chr$i.inv_DBP.glm.linear | cat >> DBP_females_linear_result
 sed '1d' BP_females_chr$i.inv_MAP.glm.linear | cat >> MAP_females_linear_result
 sed '1d' BP_females_chr$i.inv_PP.glm.linear | cat >> PP_females_linear_result
+sed '1d' BP_females_chr$i.inv_HR.glm.linear | cat >> HR_females_linear_result
 
 sed '1d' info_Rsq_chr$i | cat >> imputation_quality
 
