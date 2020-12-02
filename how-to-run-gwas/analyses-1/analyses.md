@@ -2,7 +2,7 @@
 
 ## Background
 
-On this page you will know how to run GWAS in unrelated individuals using the popular genetic analyses tool `PLINK2`_._  Here we use blood pressure \(BP\) trait as example.
+On this page you will know how to run GWAS in unrelated individuals using the popular genetic analyses tool `PLINK2`_._  Here we use blood pressure \(BP\) trait as a example.
 
 ## Required Data
 
