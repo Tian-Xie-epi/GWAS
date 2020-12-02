@@ -45,6 +45,20 @@ use `zcat chr22.dose.vcf.gz | cut -f1-10 | more` to inspect dose.vcf.gz file.
 
 ![Example of chr22.dose.vcf.gz file \(HRC imputation using michigan imputation server\) ](../../.gitbook/assets/hrc_vcf_example2.png)
 
+## Preparation for analyses
+
+Always check guidelines from analyses plan before running GWAS. We may need to do some individual exclusions and stratified analyses. 
+
+For example, in our meta-GWAS of child BP project, we should exclude**:**  
+
+1. individuals&gt;=18 years of age. 
+2. reported cases of hypertension \(children with a diagnose and thereby treatment\). 
+
+In addition, stratified analyses are required:
+
+1. Ethnicity: Perform all analyses stratified by ethnicity \(Caucasians/Europeans, African Americans, etc.\) if you have data from different ethnicity. 
+2. Gender based: Perform analyses stratifying for sex, separately in males and females as well as a combined analyses, pooling all. 
+
 ## Step 1 Prepare Phenotype
 
 Before running GWAS, we always need to prepare phenotype \(e.g. trait transformation\). According to the analyses plan of our meta-GWAS project, we should do the following trait transformation:
