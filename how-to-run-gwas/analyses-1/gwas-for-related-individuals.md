@@ -4,7 +4,7 @@
 
 On this page you will know how to run GWAS in related individuals using the R package `SAIGEgds` .  
 
-`SAIGEgds`  leverages the Genomic Data Structure \(GDS\) format to provide efficient mixed-model analyses which allow for adjusting family relatedness. See more details in paper \(Zheng et al, 2020\) [https://doi.org/10.1093/bioinformatics/btaa731](https://doi.org/10.1093/bioinformatics/btaa731) and tutorial [https://github.com/AbbVie-ComputationalGenomics/SAIGEgds](https://github.com/AbbVie-ComputationalGenomics/SAIGEgds).
+`SAIGEgds`  leverages the Genomic Data Structure \(GDS\) format to provide efficient mixed-model analyses which allow for adjusting family relatedness. See more details in paper \(Zheng et al, 2020\) [https://doi.org/10.1093/bioinformatics/btaa731](https://doi.org/10.1093/bioinformatics/btaa731) and tutorial [http://www.bioconductor.org/packages/devel/bioc/vignettes/SAIGEgds/inst/doc/SAIGEgds.html](http://www.bioconductor.org/packages/devel/bioc/vignettes/SAIGEgds/inst/doc/SAIGEgds.html). 
 
 ## Required Data
 
