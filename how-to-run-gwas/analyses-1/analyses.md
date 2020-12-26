@@ -149,7 +149,7 @@ Below is the example for running models in all individuals for one chromosome. W
 {% tab title="chr22" %}
 {% code title="Code example for running GWAS of chr22" %}
 ```bash
-module load PLINK/2.00-alpha2.1-foss-2018a
+module load PLINK/2.00-alpha2.1-foss-2018a #the module name may be different in other cluster
 mkdir GWAS_results
 awk '{print $1,$2}' pheno_pooled_invBP.txt > pheno_pooled_sample.txt
 
