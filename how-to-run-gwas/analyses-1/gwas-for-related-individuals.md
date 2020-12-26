@@ -139,17 +139,9 @@ fwrite(pheno_females_invBP,file="pheno_females_invBP.txt",sep="\t")
 ```
 {% endcode %}
 
-## Run GWAS using SAIGEgds
+## Run GWAS using SAIGEgds 
 
-We use the rank based inverse normal transformed data to run the association testing with the SNPs for each individual trait, as below: 
-
-1. All individuals \(pool the inverse normal values calculated for males and females separately\) `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/inv_HR) ~ SNP` 
-
-2. In Males `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/inv_HR) ~ SNP` 
-
-3. In Females `Outcome (inv_SBP/inv_DBP/inv_PP/inv_MAP/inv_HR) ~ SNP` 
-
-`SAIGEgds` is used to run above models and all analyses are conducted in the computer cluster of  University of Groningen \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\) based on Linux operating system \(A beginners guide [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/)\). 
+`SAIGEgds` is used to run GWAS using mixed model which allow for adjusting family relatedness. All analyses are conducted in the computer cluster of  University of Groningen \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\) based on Linux operating system \(A beginners guide [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/)\). 
 
 ### Step 1 Install SAIGEgds package
 
