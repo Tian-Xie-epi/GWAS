@@ -143,9 +143,15 @@ fwrite(pheno_females_invBP,file="pheno_females_invBP.txt",sep="\t")
 
 `SAIGEgds` is used to run GWAS using mixed model which allow for adjusting family relatedness. All analyses are conducted in the computer cluster of  University of Groningen \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\) based on Linux operating system \(A beginners guide [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/)\). 
 
-### Step 1 Install SAIGEgds package
+### Step 1 Install SAIGEgds and relevant package
+
+### Step 2 convert plink and vcf file to gds file
+
+### Step 3 Preparing SNP data for genetic relationship matrix
+
+### Step 4 Fitting the null model
+
+### Step 5 Fitting the null model
 
 
-
-### Step 2 Prepare Phenotype
 
