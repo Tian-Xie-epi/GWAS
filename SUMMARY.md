@@ -4,6 +4,7 @@
 
 ## Theories of GWAS
 
+* [Key concepts of genetic epidemiology](theories-of-gwas/key-concepts-of-genetic-epidemiology.md)
 * [What is GWAS](theories-of-gwas/what-is-gwas.md)
 * [Linkage disequilibrium \(LD\)](theories-of-gwas/linkage-disequilibrium-ld.md)
 * [Population stratification](theories-of-gwas/population-stratification.md)
