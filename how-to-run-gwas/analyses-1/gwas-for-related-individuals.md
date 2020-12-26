@@ -28,6 +28,13 @@ On this page you will know how to run GWAS in related individuals using the R pa
       <td style="text-align:left">This file contains the first 20 PCs of samples</td>
     </tr>
     <tr>
+      <td style="text-align:left">chr_all_genotype.bed, chr_all_genotype.bim, chr_all_genotype.fam</td>
+      <td
+      style="text-align:left">genotyped data (Plink file)</td>
+        <td style="text-align:left">hard called genotypes (e.g. AG, CT), genotyped by specific array (e.g.
+          Illumina GSA array)</td>
+    </tr>
+    <tr>
       <td style="text-align:left">
         <p>chr1.dose.vcf.gz ...</p>
         <p>chr22.dose.vcf.gz</p>
