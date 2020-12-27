@@ -162,6 +162,8 @@ Firstly we need to install packages`SAIGEgds` and `GWASTools`. In some clusters,
 mkdir /home/R_packages 
 #set the R_LIBS environment variable, so the R packages will be installed in the directory you want 
 export R_LIBS="/home/R_packages:${R_LIBS}"
+module load R  #load R
+Rscript install.packages.R  #install packages
 ```
 
 {% code title="Rscript install.packages.R" %}
@@ -174,6 +176,8 @@ BiocManager::install("GWASTools",lib="/home/R_packages")
 {% endcode %}
 
 ### Step 2 Preparing SNP data for genetic relationship matrix
+
+
 
 ### Step 3 convert plink and vcf file to gds file
 
