@@ -18,7 +18,6 @@
   * [PLINK2 for unrelated individuals](how-to-run-gwas/analyses-1/analyses.md)
   * [SNPTEST for unrelated individuals](how-to-run-gwas/analyses-1/snptest-for-unrelated-individuals.md)
   * [SAIGEgds for related individuals](how-to-run-gwas/analyses-1/gwas-for-related-individuals.md)
-  * [Bolt-LMM for related individuals](how-to-run-gwas/analyses-1/bolt-lmm-for-related-individuals.md)
 * [Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
 * [Meta-GWAS](how-to-run-gwas/meta-gwas.md)
 * [Follow-up](how-to-run-gwas/follow-up.md)
