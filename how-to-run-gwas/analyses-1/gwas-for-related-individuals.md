@@ -185,18 +185,26 @@ module load PLINK  #load PLINK
 plink \
 --bfile chr_all_genotype \
 --indep 500 50 1.04 \
---maf 0.05 \
 --out prunedSNPs
 
 #extract pruned SNPs
 plink \
 --bfile chr_all_genotype \
 --extract prunedSNPs.prune.in \
+--maf 0.05 \
 --make-bed \
 --out SNPs_for_GRM 
 ```
 
+The meaning of the options in PLINK:
 
+| Option | Description | Output file |
+| :--- | :--- | :--- |
+| --bfile chr\_all_\__genotype | to load plink binary files:chr\_all\_genotype.bed, chr\_all\_genotype.bim, chr\_all\_genotype.fam |  |
+| --indep 500 50 1.04 | to generate a pruned subset of SNPs, The parameters for --indep are: window size in SNPs \(e.g. 500\), the number of SNPs to shift the window at each step \(e.g. 50\), the VIF threshold. The VIF is 1/\(1-R^2\) where R^2 is the multiple correlation coefficient for a SNP being regressed on all other SNPs simultaneously. Here VIF=1.04 means R=0.2. | prunedSNPs.prune.in, prunedSNPs.prune.out |
+| --extract prunedSNPs.prune.in | to extract pruned SNPs |  |
+| --maf 0.05 | to exclude SNPs with minor allele frequency \(MAF\)&lt;0.05 |  |
+| --out SNPs\_for\_GRM | to set the output file  | SNPs\_for\_GRM.bed, SNPs\_for\_GRM.bim, SNPs\_for\_GRM.fam |
 
 ### Step 3 convert plink and vcf file to gds file
 
