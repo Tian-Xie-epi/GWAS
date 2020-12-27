@@ -41,8 +41,8 @@ On this page you will know how to run GWAS in related individuals using the R pa
       <td style="text-align:left">chr_all_genotype.bed, chr_all_genotype.bim, chr_all_genotype.fam</td>
       <td
       style="text-align:left">genotyped data (Plink file)</td>
-        <td style="text-align:left">hard called genotypes (e.g. AG, CT), genotyped by specific array/chip
-          (e.g. Illumina GSA array)</td>
+        <td style="text-align:left">hard called genotypes (e.g. AG, CT) of all chromosomes, genotyped by specific
+          array/chip (e.g. Illumina GSA array)</td>
     </tr>
     <tr>
       <td style="text-align:left">
@@ -177,13 +177,31 @@ BiocManager::install("GWASTools",lib="/home/R_packages")
 
 ### Step 2 Preparing SNP data for genetic relationship matrix
 
+In this step we prepare independent SNPs \(from hard called genotypes\) for constructing genetic relationship matrix \(GRM\). To this end we do LD pruning using `PLINK` [http://zzz.bwh.harvard.edu/plink/summary.shtml\#prune](http://zzz.bwh.harvard.edu/plink/summary.shtml#prune). 
+
+```r
+module load PLINK  #load PLINK
+#LD pruning
+plink \
+--bfile chr_all_genotype \
+--indep 500 50 1.04 \
+--maf 0.05 \
+--out prunedSNPs
+#extract pruned SNPs
+plink \
+--bfile chr_all_genotype \
+--extract prunedSNPs.prune.in \
+--make-bed \
+--out SNPs_for_GRM 
+```
+
 
 
 ### Step 3 convert plink and vcf file to gds file
 
 ### Step 4 Fitting the null model
 
-### Step 5 Fitting the null model
+### Step 5 
 
 
 
