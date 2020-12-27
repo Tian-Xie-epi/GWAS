@@ -8,13 +8,13 @@ On this page you will know how to run GWAS in related individuals using the R pa
 
 **Paper** 
 
-**SAIGEgds** \(Zheng et al, 2020\) [https://doi.org/10.1093/bioinformatics/btaa731](https://doi.org/10.1093/bioinformatics/btaa731)
+**SAIGEgds** \(Zheng et al, 2020\) [https://doi.org/10.1093/bioinformatics/btaa731](https://doi.org/10.1093/bioinformatics/btaa731)\*\*\*\*
 
 **SAIGE** \(Zhou et al, 2018\) [https://www.nature.com/articles/s41588-018-0184-y](https://www.nature.com/articles/s41588-018-0184-y) 
 
-**Tutorial** [http://www.bioconductor.org/packages/devel/bioc/vignettes/SAIGEgds/inst/doc/SAIGEgds.html](http://www.bioconductor.org/packages/devel/bioc/vignettes/SAIGEgds/inst/doc/SAIGEgds.html)
+**Tutorial** 
 
-[https://bioconductor.riken.jp/packages/3.10/bioc/manuals/SAIGEgds/man/SAIGEgds.pdf](https://bioconductor.riken.jp/packages/3.10/bioc/manuals/SAIGEgds/man/SAIGEgds.pdf)
+\*\*\*\*[http://www.bioconductor.org/packages/devel/bioc/vignettes/SAIGEgds/inst/doc/SAIGEgds.htm](http://www.bioconductor.org/packages/devel/bioc/vignettes/SAIGEgds/inst/doc/SAIGEgds.html)[https://bioconductor.riken.jp/packages/3.10/bioc/manuals/SAIGEgds/man/SAIGEgds.pdf](https://bioconductor.riken.jp/packages/3.10/bioc/manuals/SAIGEgds/man/SAIGEgds.pdf)
 
 ## Required Data
 
@@ -155,9 +155,29 @@ fwrite(pheno_females_invBP,file="pheno_females_invBP.txt",sep="\t")
 
 ### Step 1 Install SAIGEgds and relevant package
 
-### Step 2 convert plink and vcf file to gds file
+Firstly we need to install packages`SAIGEgds` and `GWASTools`. 
 
-### Step 3 Preparing SNP data for genetic relationship matrix
+```r
+#Create a directory you would like to install the R packages
+mkdir /home/R_packages 
+#set the R_LIBS environment variable, so the R packages will be installed in the directory you want 
+export R_LIBS="/home/R_packages:${R_LIBS}"
+```
+
+{% code title="Rscript install.packages.R" %}
+```r
+install.packages("BiocManager",lib="/home/R_packages")
+library(BiocManager)
+BiocManager::install("SAIGEgds",lib="/home/R_packages")
+BiocManager::install("GWASTools",lib="/home/R_packages")
+```
+{% endcode %}
+
+### 
+
+### Step 2 Preparing SNP data for genetic relationship matrix
+
+### Step 3 convert plink and vcf file to gds file
 
 ### Step 4 Fitting the null model
 
