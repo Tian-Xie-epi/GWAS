@@ -155,7 +155,7 @@ fwrite(pheno_females_invBP,file="pheno_females_invBP.txt",sep="\t")
 
 ### Step 1 Install SAIGEgds and relevant package
 
-Firstly we need to install packages`SAIGEgds` and `GWASTools`. 
+Firstly we need to install packages`SAIGEgds` and `GWASTools`. In some clusters, we may need to set the R\_LIBS environment variable, and then we can run R script _install.packages.R_ to install the R packages in the directory we create.  
 
 ```r
 #Create a directory you would like to install the R packages
@@ -172,8 +172,6 @@ BiocManager::install("SAIGEgds",lib="/home/R_packages")
 BiocManager::install("GWASTools",lib="/home/R_packages")
 ```
 {% endcode %}
-
-### 
 
 ### Step 2 Preparing SNP data for genetic relationship matrix
 
