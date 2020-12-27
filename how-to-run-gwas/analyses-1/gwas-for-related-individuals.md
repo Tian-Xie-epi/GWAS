@@ -177,7 +177,7 @@ BiocManager::install("GWASTools",lib="/home/R_packages")
 
 ### Step 2 Preparing SNP data for genetic relationship matrix
 
-In this step we prepare independent SNPs \(from hard called genotypes\) for constructing genetic relationship matrix \(GRM\). To this end we do LD pruning using `PLINK` [http://zzz.bwh.harvard.edu/plink/summary.shtml\#prune](http://zzz.bwh.harvard.edu/plink/summary.shtml#prune). 
+In this step we prepare independent SNPs \(from hard called genotypes\) for constructing genetic relationship matrix \(GRM\). To this end we do LD pruning using `PLINK` [http://zzz.bwh.harvard.edu/plink/summary.shtml\#prune](http://zzz.bwh.harvard.edu/plink/summary.shtml#prune). The output Plink file _SNPs\_for\_GRM.bed, SNPs\_for\_GRM.bim, SNPs\_for\_GRM.fam_ contain LD-pruned SNPs for constructing genetic relationship matrix \(GRM\). 
 
 ```r
 module load PLINK  #load PLINK
@@ -187,6 +187,7 @@ plink \
 --indep 500 50 1.04 \
 --maf 0.05 \
 --out prunedSNPs
+
 #extract pruned SNPs
 plink \
 --bfile chr_all_genotype \
