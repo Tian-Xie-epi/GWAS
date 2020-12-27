@@ -210,7 +210,7 @@ The meaning of the options in PLINK:
 
 ### Step 4 Fitting the null model
 
-### Step 5 
+### Step 5 Calculate associations
 
 
 
