@@ -226,15 +226,34 @@ seqBED2GDS(bed.fn, fam.fn, bim.fn, "SNPs_for_GRM.gds")
 
 #to convert VCF format to GDS format
 imputed_vcf.fn <- "chr1.dose.vcf.gz"
-seqVCF2GDS(imputed_vcf.fn, "imputed_chr1.gds",fmt.import="DS") #import dosage
+seqVCF2GDS(imputed_vcf.fn,"imputed_chr1.gds",fmt.import="DS") #import dosage
 ```
 {% endcode %}
 
-
-
 ### Step 4 Fitting the null model
 
+null model fitting using GRM from grm\_fn
+
+```r
+pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"） #import phenotype file
+grm_fn <- seqOpen("SNPs_for_GRM.gds")  #open SNPs_for_GRM.gds
+#fit the null model
+glmm_pooled_SBP <- seqFitNullGLMM_SPA(inv_SBP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="UGLI_ID")
+seqClose(grm_fn)
+```
+
+
+
 ### Step 5 Calculate associations
+
+```r
+imputed_fn<-seqOpen("imputed_chr1.gds")  #open imputed data  
+assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=NaN, parallel=2)
+fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr1.txt",sep="\t")
+seqClose(imputed_fn)
+```
+
+
 
 
 
