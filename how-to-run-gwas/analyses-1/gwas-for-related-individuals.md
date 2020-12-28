@@ -270,5 +270,7 @@ seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10, missing=0.1, dsnode="", spa
 
 Arguments gdsfile a SeqArray GDS filename, or a GDS object modobj an R object for SAIGE model parameters maf minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter mac minor allele count threshold \(checking &gt;= mac\), NaN for no filter
 
+id variant ID in the GDS file; chr chromosome; pos position; rs.id the RS IDs if it is available in the GDS file; ref the reference allele; alt the alternative allele; AF.alt allele frequency for the alternative allele; the minor allele frequency is pmin\(AF.alt,1-AF.alt\); mac minor allele count; the allele count for the alternative allele is ifelse\(AF.alt&lt;=0.5,mac,2\*num-mac\); num the number of samples with non-missing genotypes; beta beta coefficient, odds ratio if binary outcomes \(alternative allele vs. reference allele\); SE standard error for beta coefficient; pval adjusted p-value with the Saddlepoint approximation method;
+
 
 
