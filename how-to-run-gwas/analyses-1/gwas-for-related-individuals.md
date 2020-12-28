@@ -230,30 +230,45 @@ seqVCF2GDS(imputed_vcf.fn,"imputed_chr1.gds",fmt.import="DS") #import dosage
 ```
 {% endcode %}
 
-### Step 4 Fitting the null model
+### Step 4 Run SAIGEgds
 
-null model fitting using GRM from grm\_fn
+First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2 and converted to gds in step 3\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function.
 
 ```r
-pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"） #import phenotype file
-grm_fn <- seqOpen("SNPs_for_GRM.gds")  #open SNPs_for_GRM.gds
-#fit the null model
-glmm_pooled_SBP <- seqFitNullGLMM_SPA(inv_SBP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="UGLI_ID")
+#import phenotype file
+pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"） 
+#open SNPs_for_GRM.gds
+grm_fn <- seqOpen("SNPs_for_GRM.gds")  
+seqSummary(grm_fn)  #basic description of SNPs_for_GRM.gds
+# step 4a, fit the null model
+glmm_pooled_SBP <- seqFitNullGLMM_SPA(inv_SBP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
 seqClose(grm_fn)
-```
-
-
-
-### Step 5 Calculate associations
-
-```r
+# step 4b, calculate associations
 imputed_fn<-seqOpen("imputed_chr1.gds")  #open imputed data  
 assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=NaN, parallel=2)
 fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr1.txt",sep="\t")
 seqClose(imputed_fn)
 ```
 
+Usage 
 
+seqFitNullGLMM\_SPA\(formula, data, gdsfile, trait.type=c\("binary", "quantitative"\), sample.col="sample.id"\) 
+
+Arguments formula an object of class formula \(or one that can be coerced to that class\), e.g., y ~ x1+x2, see lm
+
+data a data frame for the formulas
+
+gdsfile a SeqArray GDS filename, or a GDS object
+
+trait.type "binary" for binary outcomes, "quantitative" for continuous outcomes
+
+sample.col the column name of sample IDs corresponding to the GDS file
+
+Usage 
+
+seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10, missing=0.1, dsnode="", spa.pval=0.05, var.ratio=NaN, res.savefn="", res.compress="LZMA", parallel=FALSE, verbose=TRUE\) 
+
+Arguments gdsfile a SeqArray GDS filename, or a GDS object modobj an R object for SAIGE model parameters maf minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter mac minor allele count threshold \(checking &gt;= mac\), NaN for no filter
 
 
 
