@@ -98,6 +98,10 @@ Here I present a example of R code for preparing phenotype. The R code follows s
 4. trait transformation \(rank-based Inverse Normal transformation residuals\) in males and females separately
 5. export data for GWAS \(**"pheno\_pooled\_invBP.txt", "pheno\_males\_invBP.txt", "pheno\_females\_invBP.txt"**\)
 
+{% hint style="info" %}
+It is important to harmonize sample ID in phenotype data, PCA data, genotyped data and imputed data.
+{% endhint %}
+
 Three R packages are used to increase the efficiency:
 
 * package `data.table`, function `fread` and `fwrite` can import and export data faster and more convenient. [https://www.rdocumentation.org/packages/data.table/versions/1.13.0/topics/fread](https://www.rdocumentation.org/packages/data.table/versions/1.13.0/topics/fread) 
@@ -207,6 +211,26 @@ The meaning of the options in PLINK:
 | --out SNPs\_for\_GRM | to set the output file  | SNPs\_for\_GRM.bed, SNPs\_for\_GRM.bim, SNPs\_for\_GRM.fam |
 
 ### Step 3 convert plink and vcf file to gds file
+
+SAIGEgds use the Genomic Data Structure \(GDS\) format, so we need to convert other formats to GDS format. Here we use functions `seqBED2GDS` \(convert PLINK BED format to GDS format\) `seqVCF2GDS` \(convert VCF format to GDS format\) in `SeqArray` package. See more details in [https://academic.oup.com/bioinformatics/article/33/15/2251/3072873](https://academic.oup.com/bioinformatics/article/33/15/2251/3072873).
+
+![SeqArray framework and ecosystem. From Zheng et al. ](../../.gitbook/assets/image.png)
+
+{% code title="convert other formats to GDS format" %}
+```r
+#to convert PLINK BED format to GDS format
+bed.fn <- "SNPs_for_GRM.bed"
+fam.fn <- "SNPs_for_GRM.fam"
+bim.fn <- "SNPs_for_GRM.bim"
+seqBED2GDS(bed.fn, fam.fn, bim.fn, "SNPs_for_GRM.gds")
+
+#to convert VCF format to GDS format
+imputed_vcf.fn <- "chr1.dose.vcf.gz"
+seqVCF2GDS(imputed_vcf.fn, "imputed_chr1.gds",fmt.import="DS") #import dosage
+```
+{% endcode %}
+
+
 
 ### Step 4 Fitting the null model
 
