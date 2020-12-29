@@ -225,8 +225,10 @@ bim.fn <- "SNPs_for_GRM.bim"
 seqBED2GDS(bed.fn, fam.fn, bim.fn, "SNPs_for_GRM.gds")
 
 #to convert VCF format to GDS format
-imputed_vcf.fn <- "chr22.dose.vcf.gz"
-seqVCF2GDS(imputed_vcf.fn,"imputed_chr22.gds",fmt.import="DS") #import dosage
+for (i in 1:22){
+imputed_vcf.fn <- paste0("chr",i,".dose.vcf.gz")
+seqVCF2GDS(imputed_vcf.fn,paste0("imputed_chr",i,".gds"),fmt.import="DS") #import dosage
+}
 ```
 {% endcode %}
 
@@ -246,7 +248,7 @@ seqClose(grm_fn)
 # step b, calculate associations
 imputed_fn<-seqOpen("imputed_chr22.gds")  #open imputed data  
 assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=NaN)
-fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr1.txt",sep="\t")
+fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr22.txt",sep="\t")
 seqClose(imputed_fn)
 ```
 
