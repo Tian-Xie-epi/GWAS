@@ -210,7 +210,7 @@ The meaning of the options in PLINK2:
 | --out GWAS\_results/BP\_pooled\_chr22 | to set the output file |  |
 
 {% hint style="info" %}
-VCF files just contain sample IDs, instead of the distinct family and individual IDs tracked by PLINK.  It may be necessary to use [--double-id/--const-fid/--id-delim](https://www.cog-genomics.org/plink/2.0/input#sample_id_convert) to convert sample IDs to family ID \(FID\) and individual ID \(IID\).
+VCF files just contain sample IDs, instead of the distinct family and individual IDs tracked by PLINK. It may be necessary to use [--double-id/--const-fid/--id-delim](https://www.cog-genomics.org/plink/2.0/input#sample_id_convert) to convert sample IDs to family ID \(FID\) and individual ID \(IID\).
 
 `--double-id` convert  sample IDs to both FIDs and IIDs.
 
@@ -305,7 +305,7 @@ done
 
 As we have five types of files containing all chromosomes \(linear\_result, imputation\_quality, EAF, callrate, hwe files\), last step is to merge these files into one file and adapt data upload format according to the analyses plan. 
 
-Here I present a example of R code for merging files. Before merging, we should always check carefully what columns every type of file has, which columns we need and which column can be used to merge files.  
+Here I present an example of R code for merging files. Before merging, we should always check carefully what columns every type of file has, which columns we need and which column can be used to merge files.  
 
 Two R packages are used to increase the efficiency:
 
