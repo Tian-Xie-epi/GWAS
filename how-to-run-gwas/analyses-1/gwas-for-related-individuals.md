@@ -227,10 +227,8 @@ bim.fn <- "SNPs_for_GRM.bim"
 seqBED2GDS(bed.fn, fam.fn, bim.fn, "SNPs_for_GRM.gds")
 
 #to convert VCF format to GDS format
-for (i in 1:22){
-imputed_vcf.fn <- paste0("chr",i,".dose.vcf.gz")
-seqVCF2GDS(imputed_vcf.fn,paste0("imputed_chr",i,".gds"),fmt.import="DS") #import dosage
-}
+imputed_vcf.fn <- "chr22.dose.vcf.gz"
+seqVCF2GDS(imputed_vcf.fn,"imputed_chr22.gds"),fmt.import="DS") #import dosage
 ```
 {% endcode %}
 
@@ -238,9 +236,10 @@ seqVCF2GDS(imputed_vcf.fn,paste0("imputed_chr",i,".gds"),fmt.import="DS") #impor
 
 First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2b and converted to gds in step 2c\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function. 
 
-{% code title="R script, run SAIGEgds" %}
+{% code title="R script, run SAIGEgds " %}
 ```r
 library(SAIGEgds)
+
 #import phenotype file
 pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"） 
 #open SNPs_for_GRM.gds
@@ -318,7 +317,71 @@ The data frame **assoc\_pooled\_SBP** includes the association results:
 | SE | standard error for beta coefficient |
 | pval | adjusted p-value with the Saddlepoint approximation method |
 
+### R script for Step 2c and 2d
 
+Both Step 2c and 2d use R software, so here I present an example of R code combining two steps and use loop to run analyses for all chromosomes. In addition, we run analyses for all phenotypes \(SBP, DBP, PP, MAP, HR\) in pooled samples. The procedures are the same for stratified analyses in males and females. 
+
+{% code title="R script, convertGDS\_runSAIGEgds.R" %}
+```r
+library(GWASTools)
+library(SAIGEgds)
+
+bed.fn <- "SNPs_for_GRM.bed"
+fam.fn <- "SNPs_for_GRM.fam"
+bim.fn <- "SNPs_for_GRM.bim"
+seqBED2GDS(bed.fn, fam.fn, bim.fn, "SNPs_for_GRM.gds")
+
+for (i in 1:22){
+imputed_vcf.fn <- paste0("chr",i,".dose.vcf.gz")
+seqVCF2GDS(imputed_vcf.fn,paste0("imputed_chr",i,".gds"),fmt.import="DS") #import dosage
+}
+
+#pooled analyses
+#import phenotype file
+pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"）
+ 
+#open SNPs_for_GRM.gds
+grm_fn <- seqOpen("SNPs_for_GRM.gds")  
+seqSummary(grm_fn)
+  
+#fit the null model
+glmm_pooled_SBP <- seqFitNullGLMM_SPA(inv_SBP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
+glmm_pooled_DBP <- seqFitNullGLMM_SPA(inv_DBP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
+glmm_pooled_MAP <- seqFitNullGLMM_SPA(inv_MAP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
+glmm_pooled_PP <- seqFitNullGLMM_SPA(inv_PP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
+glmm_pooled_HR <- seqFitNullGLMM_SPA(inv_HR ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
+seqClose(grm_fn)
+
+#calculate associations
+SAIGEgds_pooled_SBP<-data.frame()
+SAIGEgds_pooled_DBP<-data.frame()
+SAIGEgds_pooled_MAP<-data.frame()
+SAIGEgds_pooled_PP<-data.frame()
+SAIGEgds_pooled_HR<-data.frame()
+
+for (i in 1:22){
+imputed_fn<-seqOpen(paste0("imputed_chr",i,".gds")    
+assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=NaN)
+assoc_pooled_DBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_DBP, maf=NaN, mac=NaN)
+assoc_pooled_MAP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_MAP, maf=NaN, mac=NaN)
+assoc_pooled_PP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_PP, maf=NaN, mac=NaN)
+assoc_pooled_HR <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_HR, maf=NaN, mac=NaN)
+seqClose(imputed_fn)
+#merge results of all chromosomes
+SAIGEgds_pooled_SBP<-rbind(SAIGEgds_pooled_SBP,assoc_pooled_SBP) 
+SAIGEgds_pooled_DBP<-rbind(SAIGEgds_pooled_DBP,assoc_pooled_DBP)
+SAIGEgds_pooled_MAP<-rbind(SAIGEgds_pooled_MAP,assoc_pooled_MAP)
+SAIGEgds_pooled_PP<-rbind(SAIGEgds_pooled_PP,assoc_pooled_PP)
+SAIGEgds_pooled_HR<-rbind(SAIGEgds_pooled_HR,assoc_pooled_HR)
+}
+
+fwrite(SAIGEgds_pooled_SBP,"SBP_pooled_SAIGEgds_results.txt",sep="\t")
+fwrite(SAIGEgds_pooled_DBP,"DBP_pooled_SAIGEgds_results.txt",sep="\t")
+fwrite(SAIGEgds_pooled_MAP,"MAP_pooled_SAIGEgds_results.txt",sep="\t")
+fwrite(SAIGEgds_pooled_PP,"PP_pooled_SAIGEgds_results.txt",sep="\t")
+fwrite(SAIGEgds_pooled_HR,"HR_pooled_SAIGEgds_results.txt",sep="\t")
+```
+{% endcode %}
 
 
 
