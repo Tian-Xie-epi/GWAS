@@ -225,14 +225,14 @@ bim.fn <- "SNPs_for_GRM.bim"
 seqBED2GDS(bed.fn, fam.fn, bim.fn, "SNPs_for_GRM.gds")
 
 #to convert VCF format to GDS format
-imputed_vcf.fn <- "chr1.dose.vcf.gz"
-seqVCF2GDS(imputed_vcf.fn,"imputed_chr1.gds",fmt.import="DS") #import dosage
+imputed_vcf.fn <- "chr22.dose.vcf.gz"
+seqVCF2GDS(imputed_vcf.fn,"imputed_chr22.gds",fmt.import="DS") #import dosage
 ```
 {% endcode %}
 
 ### Step 2d Run SAIGEgds
 
-First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2b and converted to gds in step 2c\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function.
+First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2b and converted to gds in step 2c\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function. 
 
 ```r
 #import phenotype file
@@ -240,12 +240,12 @@ pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"）
 #open SNPs_for_GRM.gds
 grm_fn <- seqOpen("SNPs_for_GRM.gds")  
 seqSummary(grm_fn)  #basic description of SNPs_for_GRM.gds
-# step 4a, fit the null model
+# step a, fit the null model
 glmm_pooled_SBP <- seqFitNullGLMM_SPA(inv_SBP ~ age, pheno_pooled_invBP, grm_fn, trait.type="quantitative", sample.col="IID")
 seqClose(grm_fn)
-# step 4b, calculate associations
-imputed_fn<-seqOpen("imputed_chr1.gds")  #open imputed data  
-assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=NaN, parallel=2)
+# step b, calculate associations
+imputed_fn<-seqOpen("imputed_chr22.gds")  #open imputed data  
+assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=NaN)
 fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr1.txt",sep="\t")
 seqClose(imputed_fn)
 ```
@@ -268,19 +268,50 @@ Arguments
 
 **Usage of `seqAssocGLMM_SPA` function**
 
-seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10, parallel=FALSE\) 
+seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10\) 
 
 Arguments 
 
-gdsfile a SeqArray GDS filename, or a GDS object 
+gdsfile: a GDS filename, or a GDS object of imputed SNPs, e.g. imputed\_fn representing imputed\_chr1.gds in our example.
 
-modobj an R object for SAIGE model parameters 
+modobj: an R object for SAIGE model parameters, i.e. the null model fitted in step a  \(glmm\_pooled\_SBP\).
 
-maf minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter 
+maf: minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter.
 
-mac minor allele count threshold \(checking &gt;= mac\), NaN for no filter
+mac: minor allele count threshold \(checking &gt;= mac\), NaN for no filter.
 
-id variant ID in the GDS file; chr chromosome; pos position; rs.id the RS IDs if it is available in the GDS file; ref the reference allele; alt the alternative allele; AF.alt allele frequency for the alternative allele; the minor allele frequency is pmin\(AF.alt,1-AF.alt\); mac minor allele count; the allele count for the alternative allele is ifelse\(AF.alt&lt;=0.5,mac,2\*num-mac\); num the number of samples with non-missing genotypes; beta beta coefficient, odds ratio if binary outcomes \(alternative allele vs. reference allele\); SE standard error for beta coefficient; pval adjusted p-value with the Saddlepoint approximation method;
+**Output**
+
+The data frame **assoc\_pooled\_SBP** includes the association results:
+
+{% code title="example of association results" %}
+```text
+##   id  chr pos       rs.id       ref alt  AF.alt    mac  num  beta      SE        pval
+## 1  1  22 16051497 rs141578542    A   G  0.30494505 666 1092  0.2214607 0.2194430 0.3128813
+## 2  2  22 16059752 rs139717388    G   A  0.05677656 124 1092  0.4227084 0.4240575 0.3188526
+## 3  5  22 16060995 rs2843244      G   A  0.06135531 134 1092  0.3044670 0.4100805 0.4578107
+## 4  8  22 16166919                T   A  0.01190476  26 1092 -1.0851502 0.8804521 0.2177653
+## 5  9  22 16173887                T   G  0.03067766  67 1092 -0.8195449 0.5587294 0.1424302
+## 6 10  22 16205515 rs144309057    G   A  0.01098901  24 1092 -1.0826898 0.9340256 0.2463890
+```
+{% endcode %}
+
+| column | meaning |
+| :--- | :--- |
+| id | variant ID in the GDS file |
+| chr | chromosome |
+| pos | position |
+| rs.id | the RS IDs if it is available in the GDS file |
+| ref | the reference allele |
+| alt | the alternative allele |
+| AF.alt | allele frequency for the alternative allele |
+| mac | minor allele count |
+| num | the number of samples with non-missing genotypes |
+| beta | beta coefficient, odds ratio if binary outcomes \(alternative allele vs. reference allele\) |
+| SE | standard error for beta coefficient |
+| pval | adjusted p-value with the Saddlepoint approximation method |
+
+
 
 
 
