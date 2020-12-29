@@ -142,8 +142,8 @@ return(inv_pheno)}
 pheno_males<- pheno_males %>% mutate(inv_SBP=compute_INR(SBP,pheno_males),inv_DBP=compute_INR(DBP,pheno_males),inv_MAP=compute_INR(MAP,pheno_males),inv_PP=compute_INR(PP,pheno_males),inv_HR=compute_INR(HR,pheno_males))
 pheno_females<- pheno_females %>% mutate(inv_SBP=compute_INR(SBP,pheno_females),inv_DBP=compute_INR(DBP,pheno_females),inv_MAP=compute_INR(MAP,pheno_females),inv_PP=compute_INR(PP,pheno_females),inv_HR=compute_INR(HR,pheno_females))
 
-pheno_males_invBP<-pheno_males %>% select(IID,age,inv_SBP:inv_HR)
-pheno_females_invBP<-pheno_females %>% select(IID,age,inv_SBP:inv_HR)
+pheno_males_invBP<-pheno_males %>% select(FID,IID,age,inv_SBP:inv_HR)
+pheno_females_invBP<-pheno_females %>% select(FID,IID,age,inv_SBP:inv_HR)
 pheno_pooled_invBP<-rbind(pheno_males_invBP,pheno_females_invBP)
 
 ##### Step 5 export data for GWAS  
@@ -383,5 +383,5 @@ fwrite(SAIGEgds_pooled_HR,"HR_pooled_SAIGEgds_results.txt",sep="\t")
 ```
 {% endcode %}
 
-
+## Step 3 
 
