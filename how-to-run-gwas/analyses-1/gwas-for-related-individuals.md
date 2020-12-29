@@ -383,5 +383,24 @@ fwrite(SAIGEgds_pooled_HR,"HR_pooled_SAIGEgds_results.txt",sep="\t")
 ```
 {% endcode %}
 
-## Step 3 
+## Step 3 Calculate call rate and hwe for genotyped SNPs
+
+## Step 4 Extract imputation quality from imputed data
+
+SAIGEgds cannot produce imputation quality file, so we have to extract information on imputation quality from **info.gz** file or **dose.vcf.gz** file. 
+
+* From **info.gz** file, print column 1st \(SNP ID\), 7th \(Rsq, estimated imputation accuracy\), 8th \(Genotyped, indicating genotyped or imputed\).
+
+```r
+zcat chr22.info.gz | awk 'BEGIN {FS=OFS="\t"} {print $1,$7,$8}' > info_Rsq_chr22
+```
+
+* If you don't have info.gz file, we can still extract imputation quality from **dose.vcf.gz** file using `vcftools`. [https://vcftools.github.io/man\_latest.html\#OUTPUT%20OPTIONS](https://vcftools.github.io/man_latest.html#OUTPUT%20OPTIONS)
+
+```r
+module load VCFtools
+vcftools --gzvcf chr22.dose.vcf.gz --get-INFO R2 --out info_Rsq_chr22
+```
+
+## Step 5 Merge all results
 
