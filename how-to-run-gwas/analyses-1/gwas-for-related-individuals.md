@@ -218,7 +218,6 @@ SAIGEgds use the Genomic Data Structure \(GDS\) format, so we need to convert ot
 
 {% code title="R script, convert other formats to GDS format" %}
 ```r
-library(SAIGEgds)
 library(GWASTools)
 
 #to convert PLINK BED format to GDS format
@@ -241,6 +240,7 @@ First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in s
 
 {% code title="R script, run SAIGEgds" %}
 ```r
+library(SAIGEgds)
 #import phenotype file
 pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"） 
 #open SNPs_for_GRM.gds
