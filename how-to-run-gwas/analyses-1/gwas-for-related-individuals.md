@@ -76,7 +76,7 @@ In addition, stratified analyses are required:
 1. Ethnicity: If we have data from different ethnicity, then perform all analyses stratified by ethnicity \(Caucasians/Europeans, African Americans, etc.\). If the data is mainly from one ethnicity, the few individuals from other ethnicities can be excluded. 
 2. Gender based: Perform analyses stratifying for sex, separately in males and females as well as a combined analyses, pooling all. 
 
-### Prepare phenotype
+## Step 1 Prepare phenotype
 
 Before running GWAS, we always need to prepare phenotype \(e.g. trait transformation\). According to the analyses plan of our meta-GWAS project, we should do the following trait transformation:
 
@@ -99,7 +99,7 @@ Here I present a example of R code for preparing phenotype. The R code follows s
 5. export data for GWAS \(**"pheno\_pooled\_invBP.txt", "pheno\_males\_invBP.txt", "pheno\_females\_invBP.txt"**\)
 
 {% hint style="info" %}
-It is important to harmonize sample ID in phenotype data, PCA data, genotyped data and imputed data.
+It is important to harmonize the name of variable containing sample ID in phenotype data, PCA data, genotyped data and imputed data.
 {% endhint %}
 
 Three R packages are used to increase the efficiency:
@@ -153,11 +153,11 @@ fwrite(pheno_females_invBP,file="pheno_females_invBP.txt",sep="\t")
 ```
 {% endcode %}
 
-## Run GWAS using SAIGEgds 
+## Step 2 Run GWAS using SAIGEgds 
 
 `SAIGEgds` is used to run GWAS using mixed model which allow for adjusting family relatedness. All analyses are conducted in the computer cluster of  University of Groningen \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\) based on Linux operating system \(A beginners guide [http://www.ee.surrey.ac.uk/Teaching/Unix/](http://www.ee.surrey.ac.uk/Teaching/Unix/)\). 
 
-### Step 1 Install SAIGEgds and relevant package
+### Step 2a Install SAIGEgds and relevant package
 
 Firstly we need to install packages`SAIGEgds` and `GWASTools`. In some clusters, we may need to set the R\_LIBS environment variable, and then we can run R script _install.packages.R_ to install the R packages in the directory we create.  
 
@@ -179,7 +179,7 @@ BiocManager::install("GWASTools",lib="/home/R_packages")
 ```
 {% endcode %}
 
-### Step 2 Preparing SNP data for genetic relationship matrix
+### Step 2b Preparing SNP data for genetic relationship matrix
 
 In this step we prepare independent SNPs \(from hard called genotypes\) for constructing genetic relationship matrix \(GRM\). To this end we do LD pruning using `PLINK` [http://zzz.bwh.harvard.edu/plink/summary.shtml\#prune](http://zzz.bwh.harvard.edu/plink/summary.shtml#prune). The output Plink file _SNPs\_for\_GRM.bed, SNPs\_for\_GRM.bim, SNPs\_for\_GRM.fam_ contain LD-pruned SNPs for constructing genetic relationship matrix \(GRM\). 
 
@@ -210,7 +210,7 @@ The meaning of the options in PLINK:
 | --maf 0.05 | to exclude SNPs with minor allele frequency \(MAF\)&lt;0.05 |  |
 | --out SNPs\_for\_GRM | to set the output file  | SNPs\_for\_GRM.bed, SNPs\_for\_GRM.bim, SNPs\_for\_GRM.fam |
 
-### Step 3 convert plink and vcf file to gds file
+### Step 2c convert plink and vcf file to gds file
 
 SAIGEgds use the Genomic Data Structure \(GDS\) format, so we need to convert other formats to GDS format. Here we use functions `seqBED2GDS` \(convert PLINK BED format to GDS format\) `seqVCF2GDS` \(convert VCF format to GDS format\) in `SeqArray` package. See more details in [https://academic.oup.com/bioinformatics/article/33/15/2251/3072873](https://academic.oup.com/bioinformatics/article/33/15/2251/3072873).
 
@@ -230,9 +230,9 @@ seqVCF2GDS(imputed_vcf.fn,"imputed_chr1.gds",fmt.import="DS") #import dosage
 ```
 {% endcode %}
 
-### Step 4 Run SAIGEgds
+### Step 2d Run SAIGEgds
 
-First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2 and converted to gds in step 3\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function.
+First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2b and converted to gds in step 2c\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function.
 
 ```r
 #import phenotype file
@@ -250,25 +250,35 @@ fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr1.txt",sep="\t")
 seqClose(imputed_fn)
 ```
 
-Usage 
+**Usage of `seqFitNullGLMM_SPA` function**
 
 seqFitNullGLMM\_SPA\(formula, data, gdsfile, trait.type=c\("binary", "quantitative"\), sample.col="sample.id"\) 
 
-Arguments formula an object of class formula \(or one that can be coerced to that class\), e.g., y ~ x1+x2, see lm
+Arguments 
 
-data a data frame for the formulas
+**formula:** an object of class formula, e.g., y ~ x1+x2 \(y is phenotype outcome, x1 and x2 are covariates, e.g. inv\_SBP ~ age in our example\). Note: covariate must be present in this function, so we add age as covariate although age has been adjusted in step 1. 
 
-gdsfile a SeqArray GDS filename, or a GDS object
+**data**: a data frame for the formulas, including phenotypes and covariates, e.g. pheno\_pooled\_invBP.
 
-trait.type "binary" for binary outcomes, "quantitative" for continuous outcomes
+**gdsfile**: a GDS filename, or a GDS object of LD-pruned genotyped SNPs, e.g. grm\_fn representing SNPs\_for\_GRM.gds in our example.
 
-sample.col the column name of sample IDs corresponding to the GDS file
+**trait.type**: "binary" for binary outcomes, "quantitative" for continuous outcomes. 
 
-Usage 
+**sample.col**: the column name of sample IDs corresponding to the GDS file. Make sure the column name of sample IDs is same in GDS file and phenotype file.
 
-seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10, missing=0.1, dsnode="", spa.pval=0.05, var.ratio=NaN, res.savefn="", res.compress="LZMA", parallel=FALSE, verbose=TRUE\) 
+**Usage of `seqAssocGLMM_SPA` function**
 
-Arguments gdsfile a SeqArray GDS filename, or a GDS object modobj an R object for SAIGE model parameters maf minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter mac minor allele count threshold \(checking &gt;= mac\), NaN for no filter
+seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10, parallel=FALSE\) 
+
+Arguments 
+
+gdsfile a SeqArray GDS filename, or a GDS object 
+
+modobj an R object for SAIGE model parameters 
+
+maf minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter 
+
+mac minor allele count threshold \(checking &gt;= mac\), NaN for no filter
 
 id variant ID in the GDS file; chr chromosome; pos position; rs.id the RS IDs if it is available in the GDS file; ref the reference allele; alt the alternative allele; AF.alt allele frequency for the alternative allele; the minor allele frequency is pmin\(AF.alt,1-AF.alt\); mac minor allele count; the allele count for the alternative allele is ifelse\(AF.alt&lt;=0.5,mac,2\*num-mac\); num the number of samples with non-missing genotypes; beta beta coefficient, odds ratio if binary outcomes \(alternative allele vs. reference allele\); SE standard error for beta coefficient; pval adjusted p-value with the Saddlepoint approximation method;
 
