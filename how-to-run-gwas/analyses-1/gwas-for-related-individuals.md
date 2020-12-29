@@ -216,8 +216,11 @@ SAIGEgds use the Genomic Data Structure \(GDS\) format, so we need to convert ot
 
 ![SeqArray framework and ecosystem. From Zheng et al. ](../../.gitbook/assets/image.png)
 
-{% code title="convert other formats to GDS format" %}
+{% code title="R script, convert other formats to GDS format" %}
 ```r
+library(SAIGEgds)
+library(GWASTools)
+
 #to convert PLINK BED format to GDS format
 bed.fn <- "SNPs_for_GRM.bed"
 fam.fn <- "SNPs_for_GRM.fam"
@@ -236,6 +239,7 @@ seqVCF2GDS(imputed_vcf.fn,paste0("imputed_chr",i,".gds"),fmt.import="DS") #impor
 
 First, we fit null model using GRM from LD-pruned genotyped SNPs \(prepared in step 2b and converted to gds in step 2c\) using `seqFitNullGLMM_SPA` function in `SAIGEgds` package. Second, we calculate associations between phenotype and all imputed SNPs using `seqAssocGLMM_SPA` function. 
 
+{% code title="R script, run SAIGEgds" %}
 ```r
 #import phenotype file
 pheno_pooled_invBP<-fread("pheno_pooled_invBP.txt"） 
@@ -251,8 +255,9 @@ assoc_pooled_SBP <- seqAssocGLMM_SPA(imputed_fn, glmm_pooled_SBP, maf=NaN, mac=N
 fwrite(assoc_pooled_SBP,"SBP_pooled_SAIGEgds_chr22.txt",sep="\t")
 seqClose(imputed_fn)
 ```
+{% endcode %}
 
-**Usage of `seqFitNullGLMM_SPA` function**
+#### **Usage of `seqFitNullGLMM_SPA` function**
 
 seqFitNullGLMM\_SPA\(formula, data, gdsfile, trait.type=c\("binary", "quantitative"\), sample.col="sample.id"\) 
 
@@ -268,7 +273,7 @@ Arguments
 
 **sample.col**: the column name of sample IDs corresponding to the GDS file. Make sure the column name of sample IDs is same in GDS file and phenotype file.
 
-**Usage of `seqAssocGLMM_SPA` function**
+#### **Usage of `seqAssocGLMM_SPA` function**
 
 seqAssocGLMM\_SPA\(gdsfile, modobj, maf=NaN, mac=10\) 
 
@@ -282,7 +287,7 @@ maf: minor allele frequency threshold \(checking &gt;= maf\), NaN for no filter.
 
 mac: minor allele count threshold \(checking &gt;= mac\), NaN for no filter.
 
-**Output**
+#### **Output**
 
 The data frame **assoc\_pooled\_SBP** includes the association results:
 
