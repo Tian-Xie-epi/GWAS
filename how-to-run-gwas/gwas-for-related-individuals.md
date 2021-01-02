@@ -214,7 +214,7 @@ The meaning of the options in PLINK:
 
 SAIGEgds use the Genomic Data Structure \(GDS\) format, so we need to convert other formats to GDS format. Here we use functions `seqBED2GDS` \(convert PLINK BED format to GDS format\) `seqVCF2GDS` \(convert VCF format to GDS format\) in `SeqArray` package. See more details in [https://academic.oup.com/bioinformatics/article/33/15/2251/3072873](https://academic.oup.com/bioinformatics/article/33/15/2251/3072873).
 
-![SeqArray framework and ecosystem. From Zheng et al. ](../../.gitbook/assets/image.png)
+![SeqArray framework and ecosystem. From Zheng et al. ](../.gitbook/assets/image.png)
 
 {% code title="R script, convert other formats to GDS format" %}
 ```r

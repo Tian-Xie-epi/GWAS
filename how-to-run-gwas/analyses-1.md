@@ -1,4 +1,4 @@
-# Analyses
+# 3 GWAS analyses
 
 There are several softwares for running GWAS.
 

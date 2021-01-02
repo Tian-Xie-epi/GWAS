@@ -12,12 +12,11 @@
 
 ## How to run GWAS
 
-* [Quality control](how-to-run-gwas/untitled.md)
-* [Imputation](how-to-run-gwas/imputation.md)
-* [Analyses](how-to-run-gwas/analyses-1/README.md)
-  * [PLINK2 for unrelated individuals](how-to-run-gwas/analyses-1/analyses.md)
-  * [SNPTEST for unrelated individuals](how-to-run-gwas/analyses-1/snptest-for-unrelated-individuals.md)
-  * [SAIGEgds for related individuals](how-to-run-gwas/analyses-1/gwas-for-related-individuals.md)
+* [1 Quality control](how-to-run-gwas/untitled.md)
+* [2 Imputation](how-to-run-gwas/imputation.md)
+* [3 GWAS analyses](how-to-run-gwas/analyses-1.md)
+* [3.1 PLINK2 for unrelated individuals](how-to-run-gwas/analyses.md)
+* [SAIGEgds for related individuals](how-to-run-gwas/gwas-for-related-individuals.md)
 * [Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
 * [Meta-GWAS](how-to-run-gwas/meta-gwas.md)
 * [Follow-up](how-to-run-gwas/follow-up.md)

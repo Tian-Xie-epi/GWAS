@@ -1,4 +1,4 @@
-# PLINK2 for unrelated individuals
+# 3.1 PLINK2 for unrelated individuals
 
 ## Background
 
@@ -43,7 +43,7 @@ On this page you will know how to run GWAS in unrelated individuals using the po
 
 use `zcat chr22.dose.vcf.gz | cut -f1-10 | more` to inspect dose.vcf.gz file.
 
-![Example of chr22.dose.vcf.gz file \(HRC imputation using michigan imputation server\) ](../../.gitbook/assets/hrc_vcf_example2.png)
+![Example of chr22.dose.vcf.gz file \(HRC imputation using michigan imputation server\) ](../.gitbook/assets/hrc_vcf_example2.png)
 
 ## Preparation for analyses
 
