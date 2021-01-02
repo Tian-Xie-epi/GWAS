@@ -1,4 +1,4 @@
-# SAIGEgds for related individuals
+# 3.2 SAIGEgds for related individuals
 
 ## Background
 

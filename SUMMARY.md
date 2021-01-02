@@ -16,10 +16,9 @@
 * [2 Imputation](how-to-run-gwas/imputation.md)
 * [3 GWAS analyses](how-to-run-gwas/analyses-1.md)
 * [3.1 PLINK2 for unrelated individuals](how-to-run-gwas/analyses.md)
-* [SAIGEgds for related individuals](how-to-run-gwas/gwas-for-related-individuals.md)
-* [Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
-* [Meta-GWAS](how-to-run-gwas/meta-gwas.md)
-* [Follow-up](how-to-run-gwas/follow-up.md)
+* [3.2 SAIGEgds for related individuals](how-to-run-gwas/gwas-for-related-individuals.md)
+* [4 Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
+* [5 Meta-GWAS](how-to-run-gwas/meta-gwas.md)
 
 ## How to interpret GWAS
 
