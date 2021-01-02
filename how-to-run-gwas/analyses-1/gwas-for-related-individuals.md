@@ -383,7 +383,16 @@ fwrite(SAIGEgds_pooled_HR,"HR_pooled_SAIGEgds_results.txt",sep="\t")
 ```
 {% endcode %}
 
-## Step 3 Calculate call rate and hwe for genotyped SNPs
+## Step 3 Calculate call rate and HWE for genotyped SNPs
+
+Call rate and HWE P value of markers are required for genotyped data. Here we use _PLINK_ to calculate them in genotyped data \(plink file,  chr\_all\_genotype.bed, chr\_all\_genotype.bim, chr\_all\_genotype.fam\).  First, we print the first two columns \(`awk '{print $1,$2}'`\) of the phenotype file, which contains FID and IID of samples we need. Second, we use plink `--missing` function to calculate call rate \(output is **CR\_hwe\_pooled.lmiss**\)  and `--hardy` to calculate HWE P value \(output is **CR\_hwe\_pooled.hwe**\). See more details in [http://zzz.bwh.harvard.edu/plink/summary.shtml\#missing](http://zzz.bwh.harvard.edu/plink/summary.shtml#missing)
+
+```bash
+#print sample ID
+awk '{print $1,$2}' pheno_pooled_invBP.txt > pheno_pooled_sample.txt
+#Calculate call rate and hwe for genotyped SNPs
+plink --bfile chr_all_genotype --keep pheno_pooled_sample.txt --missing --hardy --out CR_hwe_pooled
+```
 
 ## Step 4 Extract imputation quality from imputed data
 
