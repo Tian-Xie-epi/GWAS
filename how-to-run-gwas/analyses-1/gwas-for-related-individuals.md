@@ -491,9 +491,9 @@ males_results<-males_SAIGEgds %>% left_join(males_callrate_hwe,by="NAME") %>% le
 females_results<-females_SAIGEgds %>% left_join(females_callrate_hwe,by="NAME") %>% left_join(Imputation_quality,by="NAME") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
 
 ##export data
-fwrite(pooled_results,file=paste0(c[i],"_POOLED_EA_201220_TX.txt"),sep="\t")
-fwrite(males_results,file=paste0(c[i],"_MALES_EA_201220_TX.txt"),sep="\t")
-fwrite(females_results,file=paste0(c[i],"_FEMALES_EA_201220_TX.txt"),sep="\t")
+fwrite(pooled_results,file=paste0(c[i],"_POOLED_EA_201220_TX.txt.gz"),sep="\t")
+fwrite(males_results,file=paste0(c[i],"_MALES_EA_201220_TX.txt.gz"),sep="\t")
+fwrite(females_results,file=paste0(c[i],"_FEMALES_EA_201220_TX.txt.gz"),sep="\t")
 }
 ```
 {% endcode %}
@@ -509,7 +509,82 @@ For the sake of convenience and efficiency, we put all these five steps in one s
 
 It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_201220\_TX.txt.gz\). In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
 
-```r
+```bash
+#!/bin/bash
+#SBATCH --time=16:00:00
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=95G
+#SBATCH --job-name=GWAS_pipeline
+#SBATCH --export=NONE
+#SBATCH --get-user-env=L60
 
+#### Name: Tian Xie
+#### Date: 20201220
+#### Project: GWAS pipeline of SAIGEgds
+
+module load PLINK     #load PLINK
+module load R         #load R
+module load VCFtools  #load VCFtools
+
+#################################################### GWAS pipeline
+## step 1 prepare phenotype
+## step 2 run GWAS using SAIGEgds
+## step 3 calculate call rate and HWE for genotyped SNPs
+## step 4 extract imputation quality from HRC imputed data
+## step 5 merge all results
+
+######################### Step 1 prepare phenotype
+#using R to deal with phenotype 
+Rscript prepare_phenotype.R
+
+######################### Step 2 run GWAS using SAIGEgds 
+#step 2a install SAIGEgds
+#Create a directory you would like to install the R packages
+mkdir /home/R_packages 
+#set the R_LIBS environment variable, so the R packages will be installed in the directory you want 
+export R_LIBS="/home/R_packages:${R_LIBS}"
+module load R  #load R
+Rscript install.packages.R  #install packages
+
+#step 2b Preparing SNP data for genetic relationship matrix
+#LD pruning
+plink \
+--bfile chr_all_genotype \
+--indep 500 50 1.04 \
+--out prunedSNPs
+#extract pruned SNPs
+plink \
+--bfile chr_all_genotype \
+--extract prunedSNPs.prune.in \
+--maf 0.05 \
+--make-bed \
+--out SNPs_for_GRM 
+
+#step 2c and 2d, convert to gds file and run SAIGEgds
+Rscript convertGDS_runSAIGEgds.R
+
+######################### step 3 calculate call rate and HWE for genotyped SNPs
+#print sample ID
+awk '{print $1,$2}' pheno_pooled_invBP.txt > pheno_pooled_sample.txt
+awk '{print $1,$2}' pheno_males_invBP.txt > pheno_males_sample.txt
+awk '{print $1,$2}' pheno_females_invBP.txt > pheno_females_sample.txt
+#Calculate call rate and hwe for genotyped SNPs
+plink --bfile chr_all_genotype --keep pheno_pooled_sample.txt --missing --hardy --out CR_hwe_pooled
+plink --bfile chr_all_genotype --keep pheno_males_sample.txt --missing --hardy --out CR_hwe_males
+plink --bfile chr_all_genotype --keep pheno_females_sample.txt --missing --hardy --out CR_hwe_females
+
+######################### step 4 extract imputation quality from HRC imputed data
+for i in {1..22}
+do
+vcftools --gzvcf chr${i}.dose.vcf.gz --get-INFO R2 --out info_Rsq_chr${i}
+done
+#merge results of all chromosomes
+head -n 1 info_Rsq_chr1 > imputation_quality
+sed '1d' info_Rsq_chr$i | cat >> imputation_quality
+
+######################### step 5 merge all results
+##use R to merge SAIGEgds_results, imputation_quality, callrate, hwe into one file
+Rscript merge_results.R
 ```
 
