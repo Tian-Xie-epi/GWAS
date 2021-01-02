@@ -390,25 +390,20 @@ Call rate and HWE P value of markers are required for genotyped data. Here we us
 ```bash
 #print sample ID
 awk '{print $1,$2}' pheno_pooled_invBP.txt > pheno_pooled_sample.txt
+awk '{print $1,$2}' pheno_males_invBP.txt > pheno_males_sample.txt
+awk '{print $1,$2}' pheno_females_invBP.txt > pheno_females_sample.txt
 #Calculate call rate and hwe for genotyped SNPs
 plink --bfile chr_all_genotype --keep pheno_pooled_sample.txt --missing --hardy --out CR_hwe_pooled
+plink --bfile chr_all_genotype --keep pheno_males_sample.txt --missing --hardy --out CR_hwe_males
+plink --bfile chr_all_genotype --keep pheno_females_sample.txt --missing --hardy --out CR_hwe_females
 ```
 
 ## Step 4 Extract imputation quality from imputed data
 
-SAIGEgds cannot produce imputation quality file, so we have to extract information on imputation quality from **info.gz** file or **dose.vcf.gz** file. 
+SAIGEgds cannot produce imputation quality file, so we have to extract information on imputation quality from **dose.vcf.gz** file. 
 
-* From **info.gz** file, print column 1st \(SNP ID\), 7th \(Rsq, estimated imputation accuracy\), 8th \(Genotyped, indicating genotyped or imputed\).
-
-```r
-for i in {1..22}
-do
-zcat chr${i}.info.gz | awk 'BEGIN {FS=OFS="\t"} {print $1,$7,$8}' > info_Rsq_chr${i}
-done
-```
-
-* If you don't have info.gz file, we can still extract imputation quality from **dose.vcf.gz** file using `vcftools`. [https://vcftools.github.io/man\_latest.html\#OUTPUT%20OPTIONS](https://vcftools.github.io/man_latest.html#OUTPUT%20OPTIONS)
-* Finally we need to merge results of all chromosomes. Please note: all files have a header containing column names, we should keep only one header and remove headers of other files. 
+* First, extract imputation quality from **dose.vcf.gz** file using `vcftools`. [https://vcftools.github.io/man\_latest.html\#OUTPUT%20OPTIONS](https://vcftools.github.io/man_latest.html#OUTPUT%20OPTIONS)
+* Then we need to merge results of all chromosomes. Please note: all files have a header containing column names, we should keep only one header and remove headers of other files. 
 
 ```r
 module load VCFtools
@@ -437,9 +432,31 @@ Two R packages are used to increase the efficiency:
 library(data.table)
 library(dplyr)
 
+#import imputation quality, create unique marker name (chr:pos_alleles)
+Imputation_quality<-fread("imputation_quality.txt") 
+Imputation_quality$ALT<-as.character(Imputation_quality$ALT)
+Imputation_quality$REF<-as.character(Imputation_quality$REF)
+Imputation_quality<-Imputation_quality%>%mutate(NAME=ifelse(ALT>REF,paste0(CHROM,":",POS,"_",ALT,"_",REF),paste0(CHROM,":",POS,"_",REF,"_",ALT)))
+Imputation_quality<-Imputation_quality%>%select(NAME,INFO)
+
+#import bim file of genotyped data 
+bim_file<-fread("chr_all_genotype.bim",sep="\t",header=F)
+colnames(bim_file)<-c("CHR","SNP","M","POS","A1","A2")
+
 c<-c("pooled","males","females")
 for (i in 1:3) {
-#import data and rename columns
+#merge call rate and hwe files of genotyped data
+callrate<-fread(paste0("CR_hwe_",c[i],".lmiss"))
+callrate<-callrate %>% mutate(CALLRATE=1-F_MISS) %>% select(CALLRATE)
+hwe<-fread(paste0("CR_hwe_",c[i],".hwe"))
+hwe<-hwe %>% rename(P_HWE=P) %>% select(P_HWE)
+callrate_hwe<-cbind(bim_file,callrate,hwe)
+callrate_hwe$A1<-as.character(callrate_hwe$A1)
+callrate_hwe$A2<-as.character(callrate_hwe$A2)
+callrate_hwe<-callrate_hwe%>%mutate(NAME=ifelse(A1>A2,paste0(CHR,":",POS,"_",A1,"_",A2),paste0(CHR,":",POS,"_",A2,"_",A1)))
+callrate_hwe<-callrate_hwe%>%mutate(INFO_TYPE="Genotyped")%>% select(NAME,CALLRATE,P_HWE,INFO_TYPE)
+
+#import SAIGEgds results
 SBP_linear<-fread(paste0("SBP_",c[i],"_linear_result"))
 DBP_linear<-fread(paste0("DBP_",c[i],"_linear_result"))
 MAP_linear<-fread(paste0("MAP_",c[i],"_linear_result"))
