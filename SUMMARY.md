@@ -18,9 +18,9 @@
 * [3.1 PLINK2 for unrelated individuals](how-to-run-gwas/3.1-plink2-for-unrelated-individuals.md)
 * [3.2 SAIGEgds for related individuals](how-to-run-gwas/3.2-saigegds-for-related-individual.md)
 * [4 Post-GWAS QC](how-to-run-gwas/4-post-gwas-qc.md)
-* [5 Meta-GWAS](how-to-run-gwas/meta-gwas.md)
+* [5 Meta-GWAS](how-to-run-gwas/5-meta-gwas.md)
 
-## Resources and references <a id="how-to-interpret-gwas"></a>
+## Resources and references
 
-* [全基因组关联分析学习资料（GWAS tutorial）](how-to-interpret-gwas/resources.md)
+* [全基因组关联分析学习资料（GWAS tutorial）](resources-and-references/resources.md)
 
