@@ -13,7 +13,7 @@
 ## How to run GWAS
 
 * [1 Quality control](how-to-run-gwas/1-quality-control.md)
-* [2 Imputation](how-to-run-gwas/imputation.md)
+* [2 Imputation](how-to-run-gwas/2-imputation.md)
 * [3 GWAS analyses](how-to-run-gwas/analyses-1.md)
 * [3.1 PLINK2 for unrelated individuals](how-to-run-gwas/analyses.md)
 * [3.2 SAIGEgds for related individuals](how-to-run-gwas/gwas-for-related-individuals.md)
