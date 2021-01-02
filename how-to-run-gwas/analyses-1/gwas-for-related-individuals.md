@@ -423,52 +423,7 @@ sed '1d' info_Rsq_chr$i | cat >> imputation_quality
 
 ## Step 5 Merge all results
 
-Now, we have generated all results in "GWAS\_results" folder, next is to merge all results. 
-
-### Merge all chromosomes
-
-In step 2 and 3, we use for loop to run GWAS and extract imputation quality info for every chromosome, and now we need to merge results of all chromosomes. Please note: all files have a header containing column names, we should keep only one header and remove headers of other files. 
-
-Taking SBP result as example, the merging process includes the following steps:
-
-1. First we use `head -n 1` to save the first line \(header\) to "SBP\_pooled\_linear\_result" file.
-2. Then we use `sed '1d'` to delete the header of every chromosome result. 
-3. Finally we use `cat >>` to append contents of every chromosome result at the end of "SBP\_pooled\_linear\_result" file.
-
-{% code title="code for merging all chromosomes" %}
-```r
-cd GWAS_results  #go to the results folder
- 
-#keep header
-head -n 1 BP_pooled_chr1.inv_SBP.glm.linear > SBP_pooled_linear_result
-head -n 1 BP_pooled_chr1.inv_DBP.glm.linear > DBP_pooled_linear_result
-head -n 1 BP_pooled_chr1.inv_MAP.glm.linear > MAP_pooled_linear_result
-head -n 1 BP_pooled_chr1.inv_PP.glm.linear > PP_pooled_linear_result
-head -n 1 BP_pooled_chr1.inv_HR.glm.linear > HR_pooled_linear_result
-head -n 1 info_Rsq_chr1 > imputation_quality
-head -n 1 BP_pooled_chr1.afreq > BP_pooled_EAF
-head -n 1 BP_pooled_chr1.vmiss > BP_pooled_callrate
-head -n 1 BP_pooled_chr1.hardy > BP_pooled_hwe
-
-#merge all chromosomes
-for i in {1..22}
-do
-sed '1d' BP_pooled_chr$i.inv_SBP.glm.linear | cat >> SBP_pooled_linear_result
-sed '1d' BP_pooled_chr$i.inv_DBP.glm.linear | cat >> DBP_pooled_linear_result
-sed '1d' BP_pooled_chr$i.inv_MAP.glm.linear | cat >> MAP_pooled_linear_result
-sed '1d' BP_pooled_chr$i.inv_PP.glm.linear | cat >> PP_pooled_linear_result
-sed '1d' BP_pooled_chr$i.inv_HR.glm.linear | cat >> HR_pooled_linear_result
-sed '1d' info_Rsq_chr$i | cat >> imputation_quality
-sed '1d' BP_pooled_chr$i.afreq | cat >> BP_pooled_EAF
-sed '1d' BP_pooled_chr$i.vmiss | cat >> BP_pooled_callrate
-sed '1d' BP_pooled_chr$i.hardy | cat >> BP_pooled_hwe
-done
-```
-{% endcode %}
-
-### Merge all files using R 
-
-As we have five types of files containing all chromosomes \(linear\_result, imputation\_quality, EAF, callrate, hwe files\), last step is to merge these files into one file and adapt data upload format according to the analyses plan. 
+Now, we have generated four types of result files \(SAIGEgds\_result, callrate, hwe files, imputation\_quality\), last step is to merge these files into one file and adapt data upload format according to the analyses plan. 
 
 Here I present an example of R code for merging files. Before merging, we should always check carefully what columns every type of file has, which columns we need and which column can be used to merge files.  
 
