@@ -22,11 +22,6 @@
 
 ## How to interpret GWAS
 
-* [GWAS Interpretation](how-to-interpret-gwas/gwas-interpretation.md)
 * [Resourses](how-to-interpret-gwas/resourses/README.md)
   * [全基因组关联分析学习资料（GWAS tutorial）](how-to-interpret-gwas/resourses/resources.md)
-
-## How to calculate PRS <a id="how-to-do-prs"></a>
-
-* [Untitled](how-to-do-prs/untitled.md)
 
