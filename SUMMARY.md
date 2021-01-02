@@ -17,7 +17,7 @@
 * [3 GWAS analyses](how-to-run-gwas/3-gwas-analyses.md)
 * [3.1 PLINK2 for unrelated individuals](how-to-run-gwas/3.1-plink2-for-unrelated-individuals.md)
 * [3.2 SAIGEgds for related individuals](how-to-run-gwas/3.2-saigegds-for-related-individual.md)
-* [4 Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
+* [4 Post-GWAS QC](how-to-run-gwas/4-post-gwas-qc.md)
 * [5 Meta-GWAS](how-to-run-gwas/meta-gwas.md)
 
 ## Resources and references <a id="how-to-interpret-gwas"></a>
