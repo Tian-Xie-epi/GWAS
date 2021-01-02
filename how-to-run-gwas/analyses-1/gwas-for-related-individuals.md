@@ -500,12 +500,14 @@ fwrite(females_results,file=paste0(c[i],"_FEMALES_EA_201220_TX.txt"),sep="\t")
 
 ## Summary
 
-In summary, to run GWAS in unrelated individuals, we need to 1\) prepare phenotype, 2\) run GWAS using PLINK2, 3\) extract imputation quality, 4\) merge all results. 
+In summary, to run GWAS in related individuals, we need to 1\) prepare phenotype, 2\) run GWAS using SAIGEgds package, 3\) calculate call rate and HWE for genotyped SNPs, 4\) extract imputation quality, 5\) merge all results. 
 
-For the sake of convenience and efficiency, we put all these four steps in one shell script \(see below GWAS\_pipeline.sh\) and execute it in the cluster \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\). In practice, we need to:
+For the sake of convenience and efficiency, we put all these five steps in one shell script \(see below GWAS\_pipeline.sh\) and execute it in the cluster \([https://wiki.hpc.rug.nl/peregrine/start](https://wiki.hpc.rug.nl/peregrine/start)\). In practice, we need to:
 
-1. Put all required data \(phenotype and PCA data, imputed data \(VCF\) and info data\) and all scripts \(GWAS\_pipeline.sh, prepare\_phenotype.R, merge\_results.R\) in the same folder in the cluster.
+1. Put all required data \(phenotype and PCA data, genotyped data, imputed data and info data\) and all scripts \(GWAS\_pipeline.sh, prepare\_phenotype.R, install.packages.R, convertGDS\_runSAIGEgds.R, merge\_results.R\) in the same folder in the cluster.
 2. Execute the shell script using the command `sbatch GWAS_pipeline.sh`
 
-It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_250920\_TX.txt.gz\) in the subfolder **GWAS\_results**. In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
+It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_201220\_TX.txt.gz\). In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
+
+
 
