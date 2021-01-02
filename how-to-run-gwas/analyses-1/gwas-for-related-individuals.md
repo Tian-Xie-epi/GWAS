@@ -509,5 +509,7 @@ For the sake of convenience and efficiency, we put all these five steps in one s
 
 It may take from several hours to a few days for the cluster to finish the analyses. Then we can find all compressed results \(e.g. SBP\_pooled\_EA\_201220\_TX.txt.gz\). In this way, we can easily reproduce our results by just typing one command `sbatch GWAS_pipeline.sh`.
 
+```r
 
+```
 
