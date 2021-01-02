@@ -443,9 +443,9 @@ Imputation_quality<-Imputation_quality%>%select(NAME,INFO)
 bim_file<-fread("chr_all_genotype.bim",sep="\t",header=F)
 colnames(bim_file)<-c("CHR","SNP","M","POS","A1","A2")
 
+#merge call rate and hwe files of genotyped data
 c<-c("pooled","males","females")
 for (i in 1:3) {
-#merge call rate and hwe files of genotyped data
 callrate<-fread(paste0("CR_hwe_",c[i],".lmiss"))
 callrate<-callrate %>% mutate(CALLRATE=1-F_MISS) %>% select(CALLRATE)
 hwe<-fread(paste0("CR_hwe_",c[i],".hwe"))
@@ -455,42 +455,45 @@ callrate_hwe$A1<-as.character(callrate_hwe$A1)
 callrate_hwe$A2<-as.character(callrate_hwe$A2)
 callrate_hwe<-callrate_hwe%>%mutate(NAME=ifelse(A1>A2,paste0(CHR,":",POS,"_",A1,"_",A2),paste0(CHR,":",POS,"_",A2,"_",A1)))
 callrate_hwe<-callrate_hwe%>%mutate(INFO_TYPE="Genotyped")%>% select(NAME,CALLRATE,P_HWE,INFO_TYPE)
+fwrite(callrate_hwe,paste0(c[i],"_CR_hwe.txt"),sep="\t")
+}
 
-#import SAIGEgds results
-SBP_linear<-fread(paste0("SBP_",c[i],"_linear_result"))
-DBP_linear<-fread(paste0("DBP_",c[i],"_linear_result"))
-MAP_linear<-fread(paste0("MAP_",c[i],"_linear_result"))
-PP_linear<-fread(paste0("PP_",c[i],"_linear_result"))
-HR_linear<-fread(paste0("HR_",c[i],"_linear_result"))
-headername<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
-colnames(SBP_linear)<-headername
-colnames(DBP_linear)<-headername
-colnames(MAP_linear)<-headername
-colnames(PP_linear)<-headername
-colnames(HR_linear)<-headername
+#merge all files
+pheno<-c("SBP","DBP","MAP","PP","HR")
+headername<-c("CHR","POS","RS","OTHER_ALLELE","EFFECT_ALLELE","EAF","N","BETA","SE","P","NAME")
+pooled_callrate_hwe<-fread("pooled_CR_hwe.txt")
+males_callrate_hwe<-fread("males_CR_hwe.txt")
+females_callrate_hwe<-fread("females_CR_hwe.txt")
 
-EAF<-fread(paste0("BP_",c[i],"_EAF"))
-EAF<-EAF %>% select(ID,ALT_FREQS) %>% rename(EAF=ALT_FREQS)
-callrate<-fread(paste0("BP_",c[i],"_callrate"))
-callrate<-callrate %>% mutate(CALLRATE=1-F_MISS) %>% select(ID,CALLRATE)
-hwe<-fread(paste0("BP_",c[i],"_hwe"))
-hwe<-hwe %>% select(ID,P) %>% rename(P_HWE=P)
-impute<-fread("imputation_quality")
-colnames(impute)<-c("ID","INFO","INFO_TYPE")
+for (i in 1:5) {
+##import SAIGEgds results
+pooled_SAIGEgds<-fread(paste0(c[i],"_pooled_SAIGEgds_results.txt"))
+pooled_SAIGEgds$alt<-as.character(pooled_SAIGEgds$alt)
+pooled_SAIGEgds$ref<-as.character(pooled_SAIGEgds$ref)
+pooled_SAIGEgds<-pooled_SAIGEgds%>% select(chr,pos,rs.id,ref,alt,AF.alt,num,beta,SE,pval)%>% mutate(NAME=ifelse(alt>ref,paste0(chr,":",pos,"_",alt,"_",ref),paste0(chr,":",pos,"_",ref,"_",alt)))
+colnames(pooled_SAIGEgds)<-headername
 
-#merge files
-SBP_results<-SBP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
-DBP_results<-DBP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
-MAP_results<-MAP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
-PP_results<-PP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
-HR_results<-HR_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+males_SAIGEgds<-fread(paste0(c[i],"_males_SAIGEgds_results.txt"))
+males_SAIGEgds$alt<-as.character(males_SAIGEgds$alt)
+males_SAIGEgds$ref<-as.character(males_SAIGEgds$ref)
+males_SAIGEgds<-males_SAIGEgds%>% select(chr,pos,rs.id,ref,alt,AF.alt,num,beta,SE,pval)%>% mutate(NAME=ifelse(alt>ref,paste0(chr,":",pos,"_",alt,"_",ref),paste0(chr,":",pos,"_",ref,"_",alt)))
+colnames(males_SAIGEgds)<-headername
 
-#export data
-fwrite(SBP_results,file=paste0("SBP_",c[i],"_EA_250920_TX.txt"),sep="\t")
-fwrite(DBP_results,file=paste0("DBP_",c[i],"_EA_250920_TX.txt"),sep="\t")
-fwrite(MAP_results,file=paste0("MAP_",c[i],"_EA_250920_TX.txt"),sep="\t")
-fwrite(PP_results,file=paste0("PP_",c[i],"_EA_250920_TX.txt"),sep="\t")
-fwrite(HR_results,file=paste0("HR_",c[i],"_EA_250920_TX.txt"),sep="\t")
+females_SAIGEgds<-fread(paste0(c[i],"_females_SAIGEgds_results.txt"))
+females_SAIGEgds$alt<-as.character(females_SAIGEgds$alt)
+females_SAIGEgds$ref<-as.character(females_SAIGEgds$ref)
+females_SAIGEgds<-females_SAIGEgds%>% select(chr,pos,rs.id,ref,alt,AF.alt,num,beta,SE,pval)%>% mutate(NAME=ifelse(alt>ref,paste0(chr,":",pos,"_",alt,"_",ref),paste0(chr,":",pos,"_",ref,"_",alt)))
+colnames(females_SAIGEgds)<-headername
+
+##merge files
+pooled_results<-pooled_SAIGEgds %>% left_join(pooled_callrate_hwe,by="NAME") %>% left_join(Imputation_quality,by="NAME") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+males_results<-males_SAIGEgds %>% left_join(males_callrate_hwe,by="NAME") %>% left_join(Imputation_quality,by="NAME") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+females_results<-females_SAIGEgds %>% left_join(females_callrate_hwe,by="NAME") %>% left_join(Imputation_quality,by="NAME") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+
+##export data
+fwrite(pooled_results,file=paste0(c[i],"_POOLED_EA_201220_TX.txt"),sep="\t")
+fwrite(males_results,file=paste0(c[i],"_MALES_EA_201220_TX.txt"),sep="\t")
+fwrite(females_results,file=paste0(c[i],"_FEMALES_EA_201220_TX.txt"),sep="\t")
 }
 ```
 {% endcode %}
