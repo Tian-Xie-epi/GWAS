@@ -401,15 +401,125 @@ SAIGEgds cannot produce imputation quality file, so we have to extract informati
 * From **info.gz** file, print column 1st \(SNP ID\), 7th \(Rsq, estimated imputation accuracy\), 8th \(Genotyped, indicating genotyped or imputed\).
 
 ```r
-zcat chr22.info.gz | awk 'BEGIN {FS=OFS="\t"} {print $1,$7,$8}' > info_Rsq_chr22
+for i in {1..22}
+do
+zcat chr${i}.info.gz | awk 'BEGIN {FS=OFS="\t"} {print $1,$7,$8}' > info_Rsq_chr${i}
+done
 ```
 
 * If you don't have info.gz file, we can still extract imputation quality from **dose.vcf.gz** file using `vcftools`. [https://vcftools.github.io/man\_latest.html\#OUTPUT%20OPTIONS](https://vcftools.github.io/man_latest.html#OUTPUT%20OPTIONS)
+* Finally we need to merge results of all chromosomes. Please note: all files have a header containing column names, we should keep only one header and remove headers of other files. 
 
 ```r
 module load VCFtools
-vcftools --gzvcf chr22.dose.vcf.gz --get-INFO R2 --out info_Rsq_chr22
+for i in {1..22}
+do
+vcftools --gzvcf chr${i}.dose.vcf.gz --get-INFO R2 --out info_Rsq_chr${i}
+done
+#merge results of all chromosomes
+head -n 1 info_Rsq_chr1 > imputation_quality
+sed '1d' info_Rsq_chr$i | cat >> imputation_quality
 ```
 
 ## Step 5 Merge all results
+
+Now, we have generated all results in "GWAS\_results" folder, next is to merge all results. 
+
+### Merge all chromosomes
+
+In step 2 and 3, we use for loop to run GWAS and extract imputation quality info for every chromosome, and now we need to merge results of all chromosomes. Please note: all files have a header containing column names, we should keep only one header and remove headers of other files. 
+
+Taking SBP result as example, the merging process includes the following steps:
+
+1. First we use `head -n 1` to save the first line \(header\) to "SBP\_pooled\_linear\_result" file.
+2. Then we use `sed '1d'` to delete the header of every chromosome result. 
+3. Finally we use `cat >>` to append contents of every chromosome result at the end of "SBP\_pooled\_linear\_result" file.
+
+{% code title="code for merging all chromosomes" %}
+```r
+cd GWAS_results  #go to the results folder
+ 
+#keep header
+head -n 1 BP_pooled_chr1.inv_SBP.glm.linear > SBP_pooled_linear_result
+head -n 1 BP_pooled_chr1.inv_DBP.glm.linear > DBP_pooled_linear_result
+head -n 1 BP_pooled_chr1.inv_MAP.glm.linear > MAP_pooled_linear_result
+head -n 1 BP_pooled_chr1.inv_PP.glm.linear > PP_pooled_linear_result
+head -n 1 BP_pooled_chr1.inv_HR.glm.linear > HR_pooled_linear_result
+head -n 1 info_Rsq_chr1 > imputation_quality
+head -n 1 BP_pooled_chr1.afreq > BP_pooled_EAF
+head -n 1 BP_pooled_chr1.vmiss > BP_pooled_callrate
+head -n 1 BP_pooled_chr1.hardy > BP_pooled_hwe
+
+#merge all chromosomes
+for i in {1..22}
+do
+sed '1d' BP_pooled_chr$i.inv_SBP.glm.linear | cat >> SBP_pooled_linear_result
+sed '1d' BP_pooled_chr$i.inv_DBP.glm.linear | cat >> DBP_pooled_linear_result
+sed '1d' BP_pooled_chr$i.inv_MAP.glm.linear | cat >> MAP_pooled_linear_result
+sed '1d' BP_pooled_chr$i.inv_PP.glm.linear | cat >> PP_pooled_linear_result
+sed '1d' BP_pooled_chr$i.inv_HR.glm.linear | cat >> HR_pooled_linear_result
+sed '1d' info_Rsq_chr$i | cat >> imputation_quality
+sed '1d' BP_pooled_chr$i.afreq | cat >> BP_pooled_EAF
+sed '1d' BP_pooled_chr$i.vmiss | cat >> BP_pooled_callrate
+sed '1d' BP_pooled_chr$i.hardy | cat >> BP_pooled_hwe
+done
+```
+{% endcode %}
+
+### Merge all files using R 
+
+As we have five types of files containing all chromosomes \(linear\_result, imputation\_quality, EAF, callrate, hwe files\), last step is to merge these files into one file and adapt data upload format according to the analyses plan. 
+
+Here I present an example of R code for merging files. Before merging, we should always check carefully what columns every type of file has, which columns we need and which column can be used to merge files.  
+
+Two R packages are used to increase the efficiency:
+
+* package `data.table` to import and export data faster and more convenient, especially for large dataset. 
+* package `dplyr` for data manipulation \(e.g. function `mutate` to create new variables, `select` to select variables we need, `left_join` to merge data \(includes all rows in the first file\)\). 
+
+{% code title="Rscript merge\_results.R" %}
+```r
+library(data.table)
+library(dplyr)
+
+c<-c("pooled","males","females")
+for (i in 1:3) {
+#import data and rename columns
+SBP_linear<-fread(paste0("SBP_",c[i],"_linear_result"))
+DBP_linear<-fread(paste0("DBP_",c[i],"_linear_result"))
+MAP_linear<-fread(paste0("MAP_",c[i],"_linear_result"))
+PP_linear<-fread(paste0("PP_",c[i],"_linear_result"))
+HR_linear<-fread(paste0("HR_",c[i],"_linear_result"))
+headername<-c("CHR","POS","ID","OTHER_ALLELE","EFFECT_ALLELE","A1","TEST","N","BETA","SE","T_STAT","P")
+colnames(SBP_linear)<-headername
+colnames(DBP_linear)<-headername
+colnames(MAP_linear)<-headername
+colnames(PP_linear)<-headername
+colnames(HR_linear)<-headername
+
+EAF<-fread(paste0("BP_",c[i],"_EAF"))
+EAF<-EAF %>% select(ID,ALT_FREQS) %>% rename(EAF=ALT_FREQS)
+callrate<-fread(paste0("BP_",c[i],"_callrate"))
+callrate<-callrate %>% mutate(CALLRATE=1-F_MISS) %>% select(ID,CALLRATE)
+hwe<-fread(paste0("BP_",c[i],"_hwe"))
+hwe<-hwe %>% select(ID,P) %>% rename(P_HWE=P)
+impute<-fread("imputation_quality")
+colnames(impute)<-c("ID","INFO","INFO_TYPE")
+
+#merge files
+SBP_results<-SBP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+DBP_results<-DBP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+MAP_results<-MAP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+PP_results<-PP_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+HR_results<-HR_linear %>% left_join(EAF,by="ID") %>% left_join(hwe,by="ID")%>% left_join(callrate,by="ID")%>% left_join(impute,by="ID") %>% mutate(MARKER=paste0(CHR,":",POS),STRAND="+",BUILD="37.1") %>% select(MARKER,STRAND,CHR,BUILD,POS,N,EFFECT_ALLELE,OTHER_ALLELE,EAF,BETA,SE,P,P_HWE,CALLRATE,INFO_TYPE,INFO)
+
+#export data
+fwrite(SBP_results,file=paste0("SBP_",c[i],"_EA_250920_TX.txt"),sep="\t")
+fwrite(DBP_results,file=paste0("DBP_",c[i],"_EA_250920_TX.txt"),sep="\t")
+fwrite(MAP_results,file=paste0("MAP_",c[i],"_EA_250920_TX.txt"),sep="\t")
+fwrite(PP_results,file=paste0("PP_",c[i],"_EA_250920_TX.txt"),sep="\t")
+fwrite(HR_results,file=paste0("HR_",c[i],"_EA_250920_TX.txt"),sep="\t")
+}
+```
+{% endcode %}
 
