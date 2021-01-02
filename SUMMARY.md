@@ -20,8 +20,7 @@
 * [4 Post-GWAS QC](how-to-run-gwas/post-gwas-qc.md)
 * [5 Meta-GWAS](how-to-run-gwas/meta-gwas.md)
 
-## How to interpret GWAS
+## Resources and references <a id="how-to-interpret-gwas"></a>
 
-* [Resourses](how-to-interpret-gwas/resourses/README.md)
-  * [全基因组关联分析学习资料（GWAS tutorial）](how-to-interpret-gwas/resourses/resources.md)
+* [全基因组关联分析学习资料（GWAS tutorial）](how-to-interpret-gwas/resources.md)
 
